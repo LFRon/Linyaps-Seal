@@ -1,11 +1,11 @@
 # 玲珑Seal
 
-管理玲珑应用权限
-Manage Linyaps apps permissions.
+### 管理玲珑应用权限
+### Manage Linyaps apps permissions.
 
 ## 使用的Flutter框架
-Flutter: 3.38.7
-Dart: 3.10.7
+#### Flutter: 3.38.7
+#### Dart: 3.10.7
 
 ## Getting Started
 
