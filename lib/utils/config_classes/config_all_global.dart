@@ -6,11 +6,11 @@
 import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
 
-class Config_All {
+class ConfigAll_Global {
 
   RxList <Config_Extension>? ext_defs;  // 总扩展信息
 
-  Config_All ({
+  ConfigAll_Global ({
     this.ext_defs,
   });
 

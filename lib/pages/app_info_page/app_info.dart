@@ -5,7 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:linyaps_seal/utils/config_classes/linyaps_package_info.dart';
-import 'package:linyaps_seal/utils/page_utils/app_info_page/app_info_subpage.dart';
+import 'package:linyaps_seal/utils/page_utils/app_info_page/cur_app_info_subpage/app_info_subpage.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/global_app_info_subpage/global_app_info_sub_main.dart';
 
 class AppInfoPage extends StatefulWidget {
@@ -29,8 +29,8 @@ class _AppInfoPageState extends State<AppInfoPage> {
     return Scaffold(
       body: widget.curAppInfo == null
         // 如果curAppInfo传入的为空, 则进入全局应用控制页面
-        ? globalAppUI_AppInfoPage()
-        : appInfoUI_AppInfoPage(context: context, curAppInfo: widget.curAppInfo!).value()
+        ? AppInfoPage_GlobalConf()
+        : AppInfoPage_AppConf(curAppInfo: widget.curAppInfo!),
     );
   }
 }

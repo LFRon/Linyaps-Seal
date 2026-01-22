@@ -7,8 +7,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:env_variables/env_variables.dart';
 import 'package:get/get.dart';
+import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
-import 'package:linyaps_seal/utils/config_classes/config_all.dart';
+import 'package:linyaps_seal/utils/config_classes/config_all_global.dart';
+import 'package:linyaps_seal/utils/config_classes/config_cur_app.dart';
 
 class LinyapsCliHelper {
 
@@ -64,14 +66,33 @@ class LinyapsCliHelper {
   // 用于将用户更改的内容写入JSON
   static Future <void> write_linyaps_global_config () async {
     // 获取全局变量状态
-    GlobalAppState_Config globalAppState = Get.find<GlobalAppState_Config>();
-    Config_All global_config_get = globalAppState.global_config.value;
+    GlobalAppState_Config curAppConfState = Get.find<GlobalAppState_Config>();
+    ConfigAll_Global global_config_get = curAppConfState.global_config.value;
     // 转换字典为JSON格式的字符串, 以两个空格隔开
     String jsonString = const JsonEncoder.withIndent('  ').convert(global_config_get.toMap());
     // 获取当前用户名
     String USER = EnvVariables.fromEnvironment('USER');
     // 指定玲珑的states.json路径
     String linyaps_global_states_path = '/home/$USER/.config/linglong/config.json';
+    File file = File(linyaps_global_states_path);
+    // 将JSON文件写入路径
+    await file.writeAsString(jsonString, mode: FileMode.write);
+    return;
+  }
+
+  // 用于将用户更改的内容作为JSON写入至每个应用中
+  static Future <void> write_linyaps_app_config () async {
+    // 获取全局变量状态
+    GlobalAppState_AppConfig curAppConfState = Get.find<GlobalAppState_AppConfig>();
+    ConfigAll_App global_config_get = curAppConfState.curAppConf.value;
+    // 获取当前应用ID
+    String appId = global_config_get.curAppInfo.id;
+    // 转换字典为JSON格式的字符串, 以两个空格隔开
+    String jsonString = const JsonEncoder.withIndent('  ').convert(global_config_get.toMap());
+    // 获取当前用户名
+    String USER = EnvVariables.fromEnvironment('USER');
+    // 指定玲珑的states.json路径
+    String linyaps_global_states_path = '/home/$USER/.config/linglong/apps/$appId/config.json';
     File file = File(linyaps_global_states_path);
     // 将JSON文件写入路径
     await file.writeAsString(jsonString, mode: FileMode.write);

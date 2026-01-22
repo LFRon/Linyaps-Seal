@@ -175,7 +175,7 @@ class _GlobalAppUI_ExtensionsState extends State<GlobalAppUI_Extensions> {
                         await widget.deleteExtensionInfo(
                           gAppConf.global_config.value
                           .ext_defs![widget.base_index]
-                          .base,
+                          .appId,
                           index,
                         );
                       },

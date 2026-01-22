@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/Backend_API/Linyaps_CLI_API/linyaps_cli_helper.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
-import 'package:linyaps_seal/utils/config_classes/config_all.dart';
+import 'package:linyaps_seal/utils/config_classes/config_all_global.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/buttons/button_createItem.dart';
@@ -15,15 +15,15 @@ import 'package:linyaps_seal/utils/page_utils/app_info_page/buttons/button_delet
 import 'package:linyaps_seal/utils/page_utils/app_info_page/global_app_info_subpage/comp_extensions.dart';
 import 'package:yaru/yaru.dart';
 
-class globalAppUI_AppInfoPage extends StatefulWidget {
+class AppInfoPage_GlobalConf extends StatefulWidget {
 
-  const globalAppUI_AppInfoPage({super.key});
+  const AppInfoPage_GlobalConf({super.key});
 
   @override
-  State<globalAppUI_AppInfoPage> createState() => _globalAppUI_AppInfoPageState();
+  State<AppInfoPage_GlobalConf> createState() => _AppInfoPage_GlobalConfState();
 }
 
-class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
+class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
 
   // 声明全局应用变量配置信息
   late GlobalAppState_Config gAppConf;
@@ -32,7 +32,7 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
   bool is_info_loaded = false;
 
   // 存储全局配置信息
-  late Config_All global_config_info;
+  late ConfigAll_Global global_config_info;
 
   /*-------------------扩展配置部分-----------------------*/
 
@@ -50,16 +50,16 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
   // 扩展: 初始化每个扩展名字与版本的文本控制器列表
   Future <void> ConfigExt_initTextCtlList () async {
     for (var i in gAppConf.global_config.value.ext_defs ?? <Config_Extension>[]) {
-      textctl_ext_name_list[i.base] = [];   // 初始化各文本控制器
+      textctl_ext_name_list[i.appId] = [];   // 初始化各文本控制器
       textctl_ext_base_list.add(
-        TextEditingController(text: i.base),
+        TextEditingController(text: i.appId),
       );
-      textctl_ext_version_list[i.base] = [];
+      textctl_ext_version_list[i.appId] = [];
       for (var j in i.extensions_list) {
-        textctl_ext_name_list[i.base]!.add(
+        textctl_ext_name_list[i.appId]!.add(
           TextEditingController(text: j.name),
         );
-        textctl_ext_version_list[i.base]!.add(
+        textctl_ext_version_list[i.appId]!.add(
           TextEditingController(text: j.version),
         );
       }
@@ -73,12 +73,12 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
     // 存储原先oldBase的名字
     String oldBaseName = gAppConf.global_config.value
     .ext_defs![index]
-    .base;
+    .appId;
 
     // 更新base信息
     gAppConf.global_config.value
     .ext_defs![index]
-    .base = new_base_name;
+    .appId = new_base_name;
 
     // 分别更新extension子项内名字与版本文本控制器
     if (textctl_ext_name_list.containsKey(oldBaseName)) {
@@ -116,7 +116,7 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
       .ext_defs!
       .add(
         Config_Extension(
-          base: '', 
+          appId: '', 
           extensions_list: [],
         )
       );
@@ -140,33 +140,33 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
         textctl_ext_name_list[
           gAppConf.global_config.value
           .ext_defs![index]
-          .base
+          .appId
         ] == null
       ) {
         textctl_ext_name_list[
           gAppConf.global_config.value
           .ext_defs![index]
-          .base
+          .appId
         ] = [];
       }
       if (
         textctl_ext_version_list[
           gAppConf.global_config.value
           .ext_defs![index]
-          .base
+          .appId
         ] == null
       ) {
         textctl_ext_version_list[
           gAppConf.global_config.value
           .ext_defs![index]
-          .base
+          .appId
         ] = [];
       }
       // 添加新的对应文本控制器
       textctl_ext_name_list[
         gAppConf.global_config.value
         .ext_defs![index]
-        .base
+        .appId
       ]!.add(
         TextEditingController(
           text: '',
@@ -175,7 +175,7 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
       textctl_ext_version_list[
         gAppConf.global_config.value
         .ext_defs![index]
-        .base
+        .appId
       ]!.add(
         TextEditingController(
           text: '',
@@ -364,7 +364,8 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
-                        itemCount: gApp.global_config.value.ext_defs == null
+                        itemCount: gApp.global_config.value
+                                   .ext_defs == null
                         ? 0
                         : gApp.global_config.value.ext_defs!.length,
                         itemBuilder:(context, index) {
@@ -410,7 +411,8 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
                                         onPressed: () async {
                                           await ConfigExt_deleteBase(
                                             gApp.global_config.value
-                                            .ext_defs![index].base,
+                                            .ext_defs![index]
+                                            .appId,
                                             index
                                           );
                                         }
@@ -422,7 +424,7 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
                                       width: 30,
                                       child: MyButton_CreateItem(
                                         canPress: ValueNotifier<bool>(
-                                          gApp.global_config.value.ext_defs![index].base.isNotEmpty
+                                          gApp.global_config.value.ext_defs![index].appId.isNotEmpty
                                         ),
                                         onPressed: () async {
                                           await ConfigExt_createNewExt(index);
@@ -436,11 +438,11 @@ class _globalAppUI_AppInfoPageState extends State<globalAppUI_AppInfoPage> {
                                   base_index: index,
                                   textctl_name_list: textctl_ext_name_list[
                                     gApp.global_config.value
-                                    .ext_defs![index].base
+                                    .ext_defs![index].appId
                                   ] ?? [],
                                   textctl_version_list: textctl_ext_version_list[
                                     gApp.global_config.value
-                                    .ext_defs![index].base
+                                    .ext_defs![index].appId
                                   ] ?? [],
                                   writeExtensionInfo: () async {
                                     await ConfigExt_writeExtionInfo();

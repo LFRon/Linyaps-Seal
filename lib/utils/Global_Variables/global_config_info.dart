@@ -5,13 +5,13 @@
 
 import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/Backend_API/Linyaps_AppManager_API/linyaps_package_helper.dart';
-import 'package:linyaps_seal/utils/config_classes/config_all.dart';
+import 'package:linyaps_seal/utils/config_classes/config_all_global.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
 
 class GlobalAppState_Config extends GetxController {
 
   // 已存在的全局玲珑配置, 并提供转换为JSON的Map<String, dynamic>形式
-  Rx <Config_All> global_config = Config_All().obs;
+  Rx <ConfigAll_Global> global_config = ConfigAll_Global().obs;
 
   // 用于更新已存在的玲珑全局配置
   Future <void> updateGlobalConfig () async {

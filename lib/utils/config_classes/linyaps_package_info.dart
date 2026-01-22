@@ -16,6 +16,7 @@ class LinyapsPackageInfo {
   String id;   // 应用包名
   String kind;  // 玲珑包的类型 (是app,base还是runtime)
   String name;  // 应用名称
+  String base;   // 应用base依赖信息
   String description;    // 应用介绍信息
   String arch;  // 应用架构
   String version;    // 应用版本信息
@@ -29,7 +30,6 @@ class LinyapsPackageInfo {
   String? channel;   // 应用所在渠道
   String? module;    // 所用的玲珑模块
   String? size;    // 安装包文件大小
-  String? base;   // 应用base依赖信息
   String? runtime;     // 应用Runtime依赖信息(注意:可以为没有(null))
   String? schema_version;    // 应用的玲珑schema_version信息
 
@@ -47,6 +47,7 @@ class LinyapsPackageInfo {
     required this.kind,
     required this.id,
     required this.name,
+    required this.base,
     required this.version,
     required this.description,
     required this.arch,
@@ -61,7 +62,6 @@ class LinyapsPackageInfo {
     this.channel,
     this.module,
     this.size,
-    this.base,
     this.runtime,
     this.schema_version,
     this.zhName,

@@ -57,6 +57,7 @@ class LinyapsStoreApiService {
         orElse: () => LinyapsPackageInfo(
           kind: 'app',
           id: '', 
+          base: '',
           name: '', 
           version: '', 
           description: '', 
@@ -70,6 +71,7 @@ class LinyapsStoreApiService {
           kind: i['kind'] ?? app_local_info.kind,
           id: i['appId'], 
           name: app_local_info.name, 
+          base: app_local_info.base,
           version: app_local_info.version, 
           description: i['description'] ?? app_local_info.description, 
           runtime: app_local_info.runtime,
