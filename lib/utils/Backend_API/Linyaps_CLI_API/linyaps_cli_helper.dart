@@ -75,6 +75,8 @@ class LinyapsCliHelper {
     // 指定玲珑的states.json路径
     String linyaps_global_states_path = '/home/$USER/.config/linglong/config.json';
     File file = File(linyaps_global_states_path);
+    // 确保目录存在
+    await file.parent.create(recursive: true);
     // 将JSON文件写入路径
     await file.writeAsString(jsonString, mode: FileMode.write);
     return;
@@ -94,6 +96,8 @@ class LinyapsCliHelper {
     // 指定玲珑的states.json路径
     String linyaps_global_states_path = '/home/$USER/.config/linglong/apps/$appId/config.json';
     File file = File(linyaps_global_states_path);
+    // 确保目录存在
+    await file.parent.create(recursive: true);
     // 将JSON文件写入路径
     await file.writeAsString(jsonString, mode: FileMode.write);
     return;
