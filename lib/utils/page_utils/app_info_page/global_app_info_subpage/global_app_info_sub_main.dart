@@ -282,6 +282,13 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   Future <void> ConfigEnv_updateEnvKey (int index, String key) async {
     var oldKey = global_env!.keys.elementAt(index);
     var value = global_env!.values.elementAt(index);
+
+    // 检查新键是否已经存在, 若存在则不进行任何操作
+    if (
+      gAppConf.global_config.value
+      .env!.containsKey(key)
+    ) return;
+
     // 移除旧的字典信息
     gAppConf.global_config.value
     .env!.remove(oldKey);

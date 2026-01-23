@@ -213,6 +213,10 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
     var key_old = env_app!.keys.elementAt(index);
     var value_get = env_app!.values.elementAt(index);
 
+    // 检查用户临时更改的新键是否重复
+    // 如果重复则不进行任何操作
+    if (env_app!.containsKey(newKey)) return;
+
     env_app!.remove(key_old);  // 移除旧键
     env_app![newKey] = value_get;  // 给新键赋上新值
 
