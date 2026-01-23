@@ -23,10 +23,16 @@ class LinyapsCliHelper {
       // 以字符串的形式读取states.json
       String get_states_content = await file.readAsString();
       // 将字符串对象转成列表字典
-      Map<String, dynamic> jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
+      Map<String, dynamic> jsonData = {};
+      // 进行转换尝试, 如果JSON损坏则直接返回空
+      try {
+        jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
+      } catch (e) {
+        return null;
+      }
       return jsonData;
     }
-    else return Future.value(null);
+    else return null;
   }
 
   // 用于返回玲珑用户全局配置信息的方法
@@ -40,7 +46,13 @@ class LinyapsCliHelper {
       // 以字符串的形式读取states.json
       String get_states_content = await file.readAsString();
       // 将字符串对象转成列表字典
-      Map<String, dynamic> jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
+      Map<String, dynamic> jsonData = {};
+      // 进行转换尝试, 如果JSON损坏则直接返回空
+      try {
+        jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
+      } catch (e) {
+        return null;
+      }
       return jsonData;
     } else {
       return null;
@@ -57,8 +69,14 @@ class LinyapsCliHelper {
     if (await file.exists()) {
       // 以字符串的形式读取states.json
       String get_states_content = await file.readAsString();
-      // 将字符串对象转成列表字典
-      Map<String, dynamic> jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
+      // 试图将字符串对象转成列表字典
+      Map<String, dynamic> jsonData = {};
+      // 如果JSON无法解析则直接返回空
+      try {
+        jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
+      } catch (e) {
+        return null;
+      }
       return jsonData;
     } else {
       return null;
