@@ -17,13 +17,13 @@ class GlobalAppState_Config extends GetxController {
   Future <void> updateGlobalConfig () async {
 
     // 先更新扩展部分
-    List <Config_Extension> global_extension_config = await LinyapsPackageHelper.get_global_extension_config();
+    List <Config_Extension> global_extension_config = await LinyapsPackageHelper.get_config_extension_global ();
     if (global_extension_config.isNotEmpty) {
       global_config.value.ext_defs = global_extension_config.obs;
     }
 
     // 再更新环境变量部分
-    Map <String, String>? env_get = await LinyapsPackageHelper.get_global_env_config();
+    Map <String, String>? env_get = await LinyapsPackageHelper.get_env_config_global();
     if (env_get != null) {
       global_config.value.env = env_get;
     }

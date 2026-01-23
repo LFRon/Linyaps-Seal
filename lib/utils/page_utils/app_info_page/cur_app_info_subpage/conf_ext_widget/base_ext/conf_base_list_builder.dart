@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 
-class AppInfoPage_BaseExtWidget extends StatefulWidget {
+class AppInfoPage_ExtWidget_Base extends StatefulWidget {
 
   // 传入当前index是第几项
   int index;
@@ -15,17 +15,17 @@ class AppInfoPage_BaseExtWidget extends StatefulWidget {
   // 传入必需的当前扩展名称
   Extension cur_base_ext;
 
-  AppInfoPage_BaseExtWidget({
+  AppInfoPage_ExtWidget_Base({
     super.key,
     required this.cur_base_ext,
     required this.index,
   });
 
   @override
-  State<AppInfoPage_BaseExtWidget> createState() => _AppInfoPage_BaseExtWidgetState();
+  State<AppInfoPage_ExtWidget_Base> createState() => _AppInfoPage_ExtWidget_BaseState();
 }
 
-class _AppInfoPage_BaseExtWidgetState extends State<AppInfoPage_BaseExtWidget> {
+class _AppInfoPage_ExtWidget_BaseState extends State<AppInfoPage_ExtWidget_Base> {
   @override
   Widget build(BuildContext context) {
     Extension cur_base_ext = widget.cur_base_ext;
@@ -63,7 +63,7 @@ class _AppInfoPage_BaseExtWidgetState extends State<AppInfoPage_BaseExtWidget> {
                 ],
               ),
             ],
-          )
+          ),
         ],
       ),
     );

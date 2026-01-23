@@ -25,15 +25,17 @@ class GlobalAppState_AppConfig extends GetxController {
 
   // 已存在的全局玲珑对应App配置, 并提供转换为JSON的Map<String, dynamic>形式
   // 未初始化, 需要每次切换页面执行下方updateAppConfig方法更新
-  Rx <ConfigAll_App> curAppConf = ConfigAll_App(curAppInfo: LinyapsPackageInfo(
-    kind: 'app', 
-    id: '', 
-    name: '', 
-    base: '',
-    version: '', 
-    description: '', 
-    arch: ''
-  )).obs;
+  Rx <ConfigAll_App> curAppConf = ConfigAll_App(
+    curAppInfo: LinyapsPackageInfo(
+      kind: 'app', 
+      id: '', 
+      name: '', 
+      base: '',
+      version: '', 
+      description: '', 
+      arch: ''
+    ),
+  ).obs;
 
   // 用于更新已存在的玲珑全局配置
   Future <void> updateAppConfig (LinyapsPackageInfo newAppInfo) async {
@@ -44,12 +46,16 @@ class GlobalAppState_AppConfig extends GetxController {
     update();
 
     // 先更新扩展部分
-    Map<String, Config_Extension> cur_app_ext_conf = await LinyapsPackageHelper.get_app_extension_config(
+    Map <String, Config_Extension>? cur_app_ext_conf = await LinyapsPackageHelper.get_config_extension_app(
       newAppInfo,
-    ) ?? {};
-    if (cur_app_ext_conf.isNotEmpty) {
-      curAppConf.value.ext_defs = cur_app_ext_conf;
-    }
+    );
+    curAppConf.value.ext_defs = cur_app_ext_conf;
+
+    // 再更新环境变量部分
+    Map <String, String>? cur_app_env_conf = await LinyapsPackageHelper.get_env_config_app(
+      newAppInfo,
+    );
+    curAppConf.value.env = cur_app_env_conf;
 
     // TODO: 去做新加别的配置功能
 

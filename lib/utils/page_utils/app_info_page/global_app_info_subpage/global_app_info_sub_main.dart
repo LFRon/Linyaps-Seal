@@ -414,261 +414,266 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
       builder:(gAppBuild) {
         return Padding(
           padding: const EdgeInsets.only(top: 28.0, left: 35, right: 35),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: ListView(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Image.asset(
-                    width: 90,
-                    height: 90,
-                    'assets/images/linyaps-generic-app.png',
-                  ),
-                  const SizedBox(width: 30,),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        '全部应用程序',
-                        style: TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5,),
-                      Text(
-                        '适用于所有玲珑应用的更改',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40,),
-              is_info_loaded
-              ? Expanded(
-                child: ListView(
+              Padding(
+                padding: const EdgeInsets.only(right: 18.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        Image.asset(
+                          width: 90,
+                          height: 90,
+                          'assets/images/linyaps-generic-app.png',
+                        ),
+                        const SizedBox(width: 30,),
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'global env',
+                              '全部应用程序',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 35,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                            const SizedBox(height: 5,),
                             Text(
-                              '全局环境变量',
+                              '适用于所有玲珑应用的更改',
                               style: TextStyle(
-                                color: Colors.grey,
                                 fontSize: 18,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: 40,
-                          width: 40,
-                          child: MyButton_CreateItem(
-                            // 这里是否按下需要检查:
-                            // 1. 是否有env, 没有就没问题
-                            // 2. env是否已经有用户待创建的''键
-                            // 如果有则禁止继续新建防止污染字典
-                            canPress: gAppBuild.global_config.value
-                                      .env == null
-                                      ? ValueNotifier<bool>(true) 
-                                      : gAppBuild.global_config.value
-                                        .env!.containsKey('')
-                                        ? ValueNotifier<bool>(false)
-                                        : ValueNotifier<bool>(true),
-                            onPressed: () async {
-                              await ConfigEnv_createNewEnv();
-                            },
-                          ),
-                        ),
                       ],
                     ),
-                    const SizedBox(height: 10,),
-                    global_env != null
-                    ? global_env!.isNotEmpty
-                      ? YaruBorderContainer(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
-                            itemCount: global_env == null
-                                       ? 0
-                                       : global_env!.length,
-                            itemBuilder:(context, index) {
-                              return GlobalAppUI_Env(
-                                index: index, 
-                                name: global_env!.keys.elementAt(index),
-                                value: global_env!.values.elementAt(index),
-                                textctl_name: textctl_env_name[index],
-                                textctl_value: textctl_env_value[index],
-                                updateKey:(index_in, newKey) async {
-                                  await ConfigEnv_updateEnvKey(index_in, newKey);
-                                }, 
-                                updateValue:(index_in, newValue) async {
-                                  await ConfigEnv_updateEnvValue(index_in, newValue);
-                                }, 
-                                deleteKey: (index_in) async {
-                                  await ConfigEnv_deleteEnv(index_in);
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      )
-                      :SizedBox.shrink()
-                    : SizedBox.shrink(),
-                    const SizedBox(height: 20,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    const SizedBox(height: 40,),
+                    is_info_loaded
+                    ? Column(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'ext_defs',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '全局加载的扩展',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 40,
-                          width: 40,
-                          child: createBaseExtensionButton,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10,),
-                    YaruBorderContainer(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
-                        itemCount: gAppBuild.global_config.value
-                                   .ext_defs == null
-                        ? 0
-                        : gAppBuild.global_config.value.ext_defs!.length,
-                        itemBuilder:(context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0, bottom: 8.0),
-                            child: Column(
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    // 套子Row用于跟新建按钮隔开
-                                    Text(
-                                      "基础环境:",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5,),
-                                    SizedBox(
-                                      height: 30,
-                                      width: 220,
-                                      child: TextField(
-                                        controller: textctl_ext_base_list[index],
-                                        onChanged: (value) async {
-                                          await ConfigExt_updateBaseInfo(value, index);
-                                        },
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8), // 调整内边距
-                                          border: OutlineInputBorder(),   // 可选：添加边框样式
-                                        ),
-                                        style: TextStyle(
-                                          height: 1.3
-                                        ),
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 20,),
-                                    // 将删除按钮与增加按钮并排
-                                    SizedBox(
-                                      height: 30,
-                                      width: 30,
-                                      child: MyButton_DeleteItem(
-                                        onPressed: () async {
-                                          await ConfigExt_deleteBase(
-                                            gAppBuild.global_config.value
-                                            .ext_defs![index]
-                                            .appId,
-                                            index
-                                          );
-                                        }
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10,),
-                                    SizedBox(
-                                      height: 30,
-                                      width: 30,
-                                      child: MyButton_CreateItem(
-                                        canPress: ValueNotifier<bool>(
-                                          gAppBuild.global_config.value.ext_defs![index].appId.isNotEmpty
-                                        ),
-                                        onPressed: () async {
-                                          await ConfigExt_createNewExt(index);
-                                        }
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  'Global Env',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                const SizedBox(height: 10,),
-                                GlobalAppUI_Extensions(
-                                  base_index: index,
-                                  textctl_name_list: textctl_ext_name_list[
-                                    gAppBuild.global_config.value
-                                    .ext_defs![index].appId
-                                  ] ?? [],
-                                  textctl_version_list: textctl_ext_version_list[
-                                    gAppBuild.global_config.value
-                                    .ext_defs![index].appId
-                                  ] ?? [],
-                                  writeExtensionInfo: () async {
-                                    await ConfigExt_writeExtionInfo();
-                                  },
-                                  deleteExtensionInfo: (base, ext_index) async {
-                                    await ConfigExt_deleteExt(
-                                      base, 
-                                      index,
-                                      ext_index,
-                                    );
-                                  },
+                                Text(
+                                  '全局环境变量',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ],
                             ),
-                          );
-                        },
-                      )
-                    ),
+                            SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: MyButton_CreateItem(
+                                // 这里是否按下需要检查:
+                                // 1. 是否有env, 没有就没问题
+                                // 2. env是否已经有用户待创建的''键
+                                // 如果有则禁止继续新建防止污染字典
+                                canPress: gAppBuild.global_config.value
+                                          .env == null
+                                          ? ValueNotifier<bool>(true) 
+                                          : gAppBuild.global_config.value
+                                            .env!.containsKey('')
+                                            ? ValueNotifier<bool>(false)
+                                            : ValueNotifier<bool>(true),
+                                onPressed: () async {
+                                  await ConfigEnv_createNewEnv();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10,),
+                        global_env != null
+                        ? global_env!.isNotEmpty
+                          ? YaruBorderContainer(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
+                                itemCount: global_env == null
+                                           ? 0
+                                           : global_env!.length,
+                                itemBuilder:(context, index) {
+                                  return GlobalAppUI_Env(
+                                    index: index, 
+                                    name: global_env!.keys.elementAt(index),
+                                    value: global_env!.values.elementAt(index),
+                                    textctl_name: textctl_env_name[index],
+                                    textctl_value: textctl_env_value[index],
+                                    updateKey:(index_in, newKey) async {
+                                      await ConfigEnv_updateEnvKey(index_in, newKey);
+                                    }, 
+                                    updateValue:(index_in, newValue) async {
+                                      await ConfigEnv_updateEnvValue(index_in, newValue);
+                                    }, 
+                                    deleteKey: (index_in) async {
+                                      await ConfigEnv_deleteEnv(index_in);
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          )
+                          :SizedBox.shrink()
+                        : SizedBox.shrink(),
+                        const SizedBox(height: 20,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'ext_defs',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '全局加载的扩展',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: createBaseExtensionButton,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10,),
+                        YaruBorderContainer(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
+                            itemCount: gAppBuild.global_config.value
+                                       .ext_defs == null
+                            ? 0
+                            : gAppBuild.global_config.value.ext_defs!.length,
+                            itemBuilder:(context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0, bottom: 8.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        // 套子Row用于跟新建按钮隔开
+                                        Text(
+                                          "基础环境:",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        SizedBox(
+                                          height: 30,
+                                          width: 220,
+                                          child: TextField(
+                                            controller: textctl_ext_base_list[index],
+                                            onChanged: (value) async {
+                                              await ConfigExt_updateBaseInfo(value, index);
+                                            },
+                                            decoration: InputDecoration(
+                                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8), // 调整内边距
+                                              border: OutlineInputBorder(),   // 可选：添加边框样式
+                                            ),
+                                            style: TextStyle(
+                                              height: 1.3
+                                            ),
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 20,),
+                                        // 将删除按钮与增加按钮并排
+                                        SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: MyButton_DeleteItem(
+                                            onPressed: () async {
+                                              await ConfigExt_deleteBase(
+                                                gAppBuild.global_config.value
+                                                .ext_defs![index]
+                                                .appId,
+                                                index
+                                              );
+                                            }
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10,),
+                                        SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: MyButton_CreateItem(
+                                            canPress: ValueNotifier<bool>(
+                                              gAppBuild.global_config.value.ext_defs![index].appId.isNotEmpty
+                                            ),
+                                            onPressed: () async {
+                                              await ConfigExt_createNewExt(index);
+                                            }
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10,),
+                                    GlobalAppUI_Extensions(
+                                      base_index: index,
+                                      textctl_name_list: textctl_ext_name_list[
+                                        gAppBuild.global_config.value
+                                        .ext_defs![index].appId
+                                      ] ?? [],
+                                      textctl_version_list: textctl_ext_version_list[
+                                        gAppBuild.global_config.value
+                                        .ext_defs![index].appId
+                                      ] ?? [],
+                                      writeExtensionInfo: () async {
+                                        await ConfigExt_writeExtionInfo();
+                                      },
+                                      deleteExtensionInfo: (base, ext_index) async {
+                                        await ConfigExt_deleteExt(
+                                          base, 
+                                          index,
+                                          ext_index,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
+                        ),
+                      ],
+                    )
+                    : SizedBox.shrink()
                   ],
-                )
-              )
-              : SizedBox.shrink()
+                ),
+              ),
             ],
           ),
         );

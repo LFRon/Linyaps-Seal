@@ -42,8 +42,9 @@ class LinyapsCliHelper {
       // 将字符串对象转成列表字典
       Map<String, dynamic> jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
       return jsonData;
+    } else {
+      return null;
     }
-    return null;
   }
 
   // 用于返回玲珑用户对应应用配置信息的方法
@@ -59,8 +60,9 @@ class LinyapsCliHelper {
       // 将字符串对象转成列表字典
       Map<String, dynamic> jsonData = jsonDecode(get_states_content) as Map<String, dynamic>;
       return jsonData;
+    } else {
+      return null;
     }
-    return null;
   }
 
   // 用于将用户更改的内容写入JSON
@@ -86,11 +88,11 @@ class LinyapsCliHelper {
   static Future <void> write_linyaps_app_config () async {
     // 获取全局变量状态
     GlobalAppState_AppConfig curAppConfState = Get.find<GlobalAppState_AppConfig>();
-    ConfigAll_App global_config_get = curAppConfState.curAppConf.value;
+    ConfigAll_App app_config_get = curAppConfState.curAppConf.value;
     // 获取当前应用ID
-    String appId = global_config_get.curAppInfo.id;
+    String appId = app_config_get.curAppInfo.id;
     // 转换字典为JSON格式的字符串, 以两个空格隔开
-    String jsonString = const JsonEncoder.withIndent('  ').convert(global_config_get.toMap());
+    String jsonString = const JsonEncoder.withIndent('  ').convert(app_config_get.toMap());
     // 获取当前用户名
     String USER = EnvVariables.fromEnvironment('USER');
     // 指定玲珑的states.json路径

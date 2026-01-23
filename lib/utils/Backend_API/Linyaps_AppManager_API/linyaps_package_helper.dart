@@ -42,12 +42,14 @@ class LinyapsPackageHelper {
     return installedItems;
   }
 
+  /*----------------------------扩展部分--------------------------------*/
+
   // 获取玲珑全局扩展信息的方法
   // 由于玲珑扩展覆盖机制是先加载Base信息再加载应用信息
   // 因此返回格式为Map<String, List<Config_Extension>>
   // 其中key为1: Base名称, value为该Base下的所有扩展
   // 2: 是应用包名, value为该应用下的所有扩展
-  static Future <List<Config_Extension>> get_global_extension_config () async {
+  static Future <List<Config_Extension>> get_config_extension_global () async {
     // 先获取全局配置
     Map <String, dynamic>? app_config_get = await LinyapsCliHelper.get_linyaps_global_config();
     // 初始化待返回内容
@@ -82,7 +84,7 @@ class LinyapsPackageHelper {
   // 获取应用单独配置信息的方法
   // 由于玲珑App扩展加载机制是先加载Base扩展再加载App指定扩展
   // 故需要先Map里存放对应base的扩展列表, 再存放对应App的扩展列表
-  static Future <Map<String, Config_Extension>?> get_app_extension_config (LinyapsPackageInfo appInfo) async {
+  static Future <Map<String, Config_Extension>?> get_config_extension_app (LinyapsPackageInfo appInfo) async {
     // 先拆分出应用Base信息与扩展信息
     String app_base = appInfo.base;
     String appId = appInfo.id;
@@ -91,7 +93,7 @@ class LinyapsPackageHelper {
     // 初始化待返回内容
     Map <String, Config_Extension>? returnItems = {};
     // 先获取全局的扩展
-    List <Config_Extension> global_ext = await LinyapsPackageHelper.get_global_extension_config();
+    List <Config_Extension> global_ext = await LinyapsPackageHelper.get_config_extension_global ();
     // 先获取base加载的扩展
     Config_Extension? base_ext_middleware = global_ext.firstWhereOrNull(
       (element) => element.appId == app_base,
@@ -132,8 +134,12 @@ class LinyapsPackageHelper {
     return returnItems;
   }
 
+  /*--------------------------------------------------------------------*/
+
+  /*--------------------------环境变量部分------------------------------*/
+
   // 获取玲珑全局环境变量设置方法
-  static Future <Map<String, String>?> get_global_env_config () async {
+  static Future <Map<String, String>?> get_env_config_global () async {
     // 先获取全局配置
     Map <String, dynamic>? global_config_get = await LinyapsCliHelper.get_linyaps_global_config();
     Map <String, String>? returnItems = {};   // 初始化若非空将会返回的变量
@@ -147,6 +153,27 @@ class LinyapsPackageHelper {
     } else {
       return null;
     }
+  }
+
+  // 获取玲珑单个应用环境变量设置方法
+  static Future <Map<String, String>?> get_env_config_app (LinyapsPackageInfo appInfo) async {
+    // 先获取全局配置
+    Map <String, dynamic>? app_config_get = await LinyapsCliHelper.get_linyaps_app_config(
+      appInfo.id,
+    );
+
+    Map <String, String>? returnItems = {};   // 初始化若非空将会返回的变量
+    if (app_config_get != null) {  // 如果全局变量不为空则返回env子项
+      if (app_config_get['env'] != null) {
+        app_config_get['env'].forEach((key, value) {
+          returnItems[key] = value;
+        });
+      }
+      return returnItems;
+    } else {
+      return null;
+    }
+
   }
 
 }

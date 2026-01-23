@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_single_instance/flutter_single_instance.dart';
 import 'package:get/get.dart';
 import 'package:linyaps_seal/pages/middle_page.dart';
-import 'package:linyaps_seal/utils/Global_Variables/app_bar.dart';
 import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/installed_apps.dart';
@@ -29,7 +28,6 @@ void main() async {
   Get.put(GlobalAppState_Arch());
   Get.put(GlobalAppState_InstalledApps());
   Get.put(GlobalAppState_Config());
-  Get.put(GlobalAppState_AppBar());
   Get.put(GlobalAppState_AppConfig());
 
   // 初始化各实例
