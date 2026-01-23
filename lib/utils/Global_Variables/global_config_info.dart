@@ -22,6 +22,12 @@ class GlobalAppState_Config extends GetxController {
       global_config.value.ext_defs = global_extension_config.obs;
     }
 
+    // 再更新环境变量部分
+    Map <String, String>? env_get = await LinyapsPackageHelper.get_global_env_config();
+    if (env_get != null) {
+      global_config.value.env = env_get;
+    }
+
     // ToDo: 去做新加别的扩展功能
 
     update();

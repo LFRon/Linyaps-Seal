@@ -58,7 +58,7 @@ void main() async {
 class MyApp extends StatefulWidget {
   
   // 在这里声明当前应用版本号
-  static String cur_version = '0.0.2';
+  static String cur_version = '0.0.3';
 
   const MyApp({super.key});
   @override
@@ -70,6 +70,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: YaruTheme(
+        data: YaruThemeData(
+          themeMode: ThemeMode.system,
+        ),
         child: MainMiddlePage(),
       ),
     );

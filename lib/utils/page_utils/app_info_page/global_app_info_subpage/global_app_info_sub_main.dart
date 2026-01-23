@@ -12,6 +12,7 @@ import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info
 import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/buttons/button_createItem.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/buttons/button_deleteItem.dart';
+import 'package:linyaps_seal/utils/page_utils/app_info_page/global_app_info_subpage/comp_env.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/global_app_info_subpage/comp_extensions.dart';
 import 'package:yaru/yaru.dart';
 
@@ -243,6 +244,125 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   /*--------------------------------------------------------*/
 
 
+  /*---------------------环境变量部分-----------------------*/
+
+  // 存储当前全局变量
+  Map <String, String>? get global_env => gAppConf.global_config.value.env;
+
+  // 声明对应修改环境变量需要的文本控制器
+  List <TextEditingController> textctl_env_name = [];
+  List <TextEditingController> textctl_env_value = [];
+
+  // 获取当前全局变量信息
+  Future <void> ConfigEnv_initial () async {
+    // 先使用临时变量获取当前全局变量信息
+    Map <String, String> global_env_get = gAppConf.global_config.value.env ?? {};
+
+    // 更新对应修改环境变量的文本控制器
+    if (mounted) setState(() {
+      // 初始化对应修改环境变量的文本控制器
+      if (global_env_get.isNotEmpty) {
+        global_env_get.forEach((key, value) {
+          textctl_env_name.add(
+            TextEditingController(
+              text: key,
+            )
+          );
+          textctl_env_value.add(
+            TextEditingController(
+              text: value,
+            )
+          );
+        });
+      }
+    });
+  }
+
+  // 环境变量: 当用户更改环境变量键时自动触发保存的函数
+  Future <void> ConfigEnv_updateEnvKey (int index, String key) async {
+    var oldKey = global_env!.keys.elementAt(index);
+    var value = global_env!.values.elementAt(index);
+    // 移除旧的字典信息
+    gAppConf.global_config.value
+    .env!.remove(oldKey);
+    // 增加新的字典信息
+    gAppConf.global_config.value
+    .env!.addAll({
+      key: value,
+    });
+    await LinyapsCliHelper.write_linyaps_global_config();
+    if (mounted) setState(() {
+      gAppConf.update();
+    });
+    return;
+  }
+
+  // 环境变量: 当用户按下新建按钮新建环境变量时触发的函数
+  Future <void> ConfigEnv_createNewEnv () async {
+    // 若此时环境变量为null则初始化
+    if (gAppConf.global_config.value.env == null) {
+      gAppConf.global_config.value.env = {};
+    }
+    // 先检查''空键是否存在
+    if (gAppConf.global_config.value.env!.containsKey('')) {
+      return;
+    } else {
+      // 添加新的环境变量
+      global_env!.addAll({
+        '': '',
+      });
+      if (mounted) setState(() {
+        // 添加新的环境变量文本控制器
+        textctl_env_name.add(
+          TextEditingController(
+            text: '',
+          ),
+        );
+        textctl_env_value.add(
+          TextEditingController(
+            text: '',
+          ),
+        );
+        gAppConf.update();  // 触发GetX响应式更新
+      });
+    }
+  }
+
+  // 环境变量: 当用户更改环境变量值时自动触发保存的函数
+  Future <void> ConfigEnv_updateEnvValue (int index, String newValue) async {
+    var key = global_env!.keys.elementAt(index);
+    // 增加新的字典信息
+    gAppConf.global_config.value
+    .env![key] = newValue;
+    await LinyapsCliHelper.write_linyaps_global_config();
+    if (mounted) setState(() {
+      gAppConf.update();
+    });
+    return;
+  }
+
+  // 环境变量: 当用户按下子控件中的删除按钮时删除对应环境变量的函数
+  Future <void> ConfigEnv_deleteEnv (int index) async {
+    var key = global_env!.keys.elementAt(index);
+    // 删除对应环境变量
+    global_env!.remove(key);
+    // 删除对应环境变量的文本控制器
+    textctl_env_name.removeAt(index);
+    textctl_env_value.removeAt(index);
+    await LinyapsCliHelper.write_linyaps_global_config();
+    if (mounted) setState(() {
+      gAppConf.update();
+    });
+    return;
+  }
+
+
+  
+
+  /*--------------------------------------------------------*/
+
+
+
   /*---------------------权限管理部分-----------------------*/
 
 
@@ -268,9 +388,12 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     super.initState();
     // 初始化全局应用对象
     gAppConf = Get.find<GlobalAppState_Config>();
+    gAppConf.updateGlobalConfig();
     Future.microtask(() async {
       // 初始化UI文本控制器
       await ConfigExt_initTextCtlList();
+      // 初始化环境变量
+      await ConfigEnv_initial();
       // 设置页面加载完成
       await setInfoLoaded();
     });
@@ -288,7 +411,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     );
 
     return GetBuilder<GlobalAppState_Config>(
-      builder:(gApp) {
+      builder:(gAppBuild) {
         return Padding(
           padding: const EdgeInsets.only(top: 28.0, left: 35, right: 35),
           child: Column(
@@ -334,6 +457,87 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'global env',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '全局环境变量',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: MyButton_CreateItem(
+                            // 这里是否按下需要检查:
+                            // 1. 是否有env, 没有就没问题
+                            // 2. env是否已经有用户待创建的''键
+                            // 如果有则禁止继续新建防止污染字典
+                            canPress: gAppBuild.global_config.value
+                                      .env == null
+                                      ? ValueNotifier<bool>(true) 
+                                      : gAppBuild.global_config.value
+                                        .env!.containsKey('')
+                                        ? ValueNotifier<bool>(false)
+                                        : ValueNotifier<bool>(true),
+                            onPressed: () async {
+                              await ConfigEnv_createNewEnv();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10,),
+                    global_env != null
+                    ? global_env!.isNotEmpty
+                      ? YaruBorderContainer(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
+                            itemCount: global_env == null
+                                       ? 0
+                                       : global_env!.length,
+                            itemBuilder:(context, index) {
+                              return GlobalAppUI_Env(
+                                index: index, 
+                                name: global_env!.keys.elementAt(index),
+                                value: global_env!.values.elementAt(index),
+                                textctl_name: textctl_env_name[index],
+                                textctl_value: textctl_env_value[index],
+                                updateKey:(index_in, newKey) async {
+                                  await ConfigEnv_updateEnvKey(index_in, newKey);
+                                }, 
+                                updateValue:(index_in, newValue) async {
+                                  await ConfigEnv_updateEnvValue(index_in, newValue);
+                                }, 
+                                deleteKey: (index_in) async {
+                                  await ConfigEnv_deleteEnv(index_in);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                      :SizedBox.shrink()
+                    : SizedBox.shrink(),
+                    const SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -364,13 +568,13 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
-                        itemCount: gApp.global_config.value
+                        itemCount: gAppBuild.global_config.value
                                    .ext_defs == null
                         ? 0
-                        : gApp.global_config.value.ext_defs!.length,
+                        : gAppBuild.global_config.value.ext_defs!.length,
                         itemBuilder:(context, index) {
                           return Padding(
-                            padding: const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8.0),
+                            padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0, bottom: 8.0),
                             child: Column(
                               children: [
                                 Row(
@@ -410,7 +614,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                                       child: MyButton_DeleteItem(
                                         onPressed: () async {
                                           await ConfigExt_deleteBase(
-                                            gApp.global_config.value
+                                            gAppBuild.global_config.value
                                             .ext_defs![index]
                                             .appId,
                                             index
@@ -424,7 +628,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                                       width: 30,
                                       child: MyButton_CreateItem(
                                         canPress: ValueNotifier<bool>(
-                                          gApp.global_config.value.ext_defs![index].appId.isNotEmpty
+                                          gAppBuild.global_config.value.ext_defs![index].appId.isNotEmpty
                                         ),
                                         onPressed: () async {
                                           await ConfigExt_createNewExt(index);
@@ -437,11 +641,11 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                                 GlobalAppUI_Extensions(
                                   base_index: index,
                                   textctl_name_list: textctl_ext_name_list[
-                                    gApp.global_config.value
+                                    gAppBuild.global_config.value
                                     .ext_defs![index].appId
                                   ] ?? [],
                                   textctl_version_list: textctl_ext_version_list[
-                                    gApp.global_config.value
+                                    gAppBuild.global_config.value
                                     .ext_defs![index].appId
                                   ] ?? [],
                                   writeExtensionInfo: () async {

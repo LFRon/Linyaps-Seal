@@ -132,4 +132,21 @@ class LinyapsPackageHelper {
     return returnItems;
   }
 
+  // 获取玲珑全局环境变量设置方法
+  static Future <Map<String, String>?> get_global_env_config () async {
+    // 先获取全局配置
+    Map <String, dynamic>? global_config_get = await LinyapsCliHelper.get_linyaps_global_config();
+    Map <String, String>? returnItems = {};   // 初始化若非空将会返回的变量
+    if (global_config_get != null) {  // 如果全局变量不为空则返回env子项
+      if (global_config_get['env'] != null) {
+        global_config_get['env'].forEach((key, value) {
+          returnItems[key] = value;
+        });
+      }
+      return returnItems;
+    } else {
+      return null;
+    }
+  }
+
 }

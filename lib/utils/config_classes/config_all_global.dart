@@ -9,6 +9,7 @@ import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info
 class ConfigAll_Global {
 
   RxList <Config_Extension>? ext_defs;  // 总扩展信息
+  Map <String, String>? env;  // 环境变量信息
 
   ConfigAll_Global ({
     this.ext_defs,
@@ -23,6 +24,11 @@ class ConfigAll_Global {
       for (var i in ext_defs ?? []) {
         returnItems["ext_defs"].addAll(i.toMap());
       }
+    }
+
+    // 若用户设置了全局变量, 则急需处理全局变量设置
+    if (env != null) {
+      returnItems["env"] = env;
     }
     
     // 返回应该返回的Map

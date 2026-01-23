@@ -16,6 +16,8 @@ class ConfigAll_App {
   // 和它本身的扩展信息
   Map <String, Config_Extension>? ext_defs;  
 
+  Map <String, String>? env;  // 环境变量信息
+
   ConfigAll_App ({
     required this.curAppInfo,
     this.ext_defs,
@@ -39,6 +41,11 @@ class ConfigAll_App {
         returnItems["ext_defs"].remove(curAppInfo.id);
         returnItems["ext_defs"][curAppInfo.base] = value;
       }
+    }
+
+    // 再增加环境变量选项
+    if (env != null) {
+      returnItems["env"] = env;
     }
 
     // TODO: 增加应用其他配置选项

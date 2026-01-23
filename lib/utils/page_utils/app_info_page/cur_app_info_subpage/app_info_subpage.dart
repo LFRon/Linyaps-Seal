@@ -42,7 +42,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
   // 声明存储当前应用的配置信息
   late Rx <ConfigAll_App> curAppConf;
 
-  /*------------------扩展部分-------------------*/
+  /*----------------------扩展部分-------------------------*/
 
   // 声明当前应用自身加载的扩展文本控制器
   List <TextEditingController> textctl_ext_name_list = [];
@@ -150,7 +150,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
     return;
   } 
 
-  /*---------------------------------------------*/
+  /*----------------------------------------------------*/
 
   // 页面加载状态管理, 默认为未加载状态
   bool is_page_loaded = false;
@@ -207,8 +207,8 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
         // 在Builder内获取Base扩展信息
         String cur_app_base = curAppInfo.base;
         Map <String, Config_Extension>? app_ext_defs = gAppStateConf
-                                                      .curAppConf.value
-                                                      .ext_defs ?? {};
+                                                       .curAppConf.value
+                                                       .ext_defs ?? {};
         // 页面构建时存储应用对应Base扩展的列表
         List <Extension> base_ext_list = [];
         // 如果对应应用有加载了base, 即获取不为空
