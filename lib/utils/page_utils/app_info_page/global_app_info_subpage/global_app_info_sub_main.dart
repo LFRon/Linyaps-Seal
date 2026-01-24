@@ -210,7 +210,12 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   /*---------------------环境变量部分-----------------------*/
 
   // 存储当前全局变量
-  Map <String, String>? get env_global => gAppConf.global_config.value.env;
+  Map <String, String>? get env_global => gAppConf.global_config.value
+                                          .env;
+  set env_global (Map <String, String>? value) {
+    gAppConf.global_config.value
+    .env = value;
+  }
 
   // 声明对应修改环境变量需要的文本控制器
   List <TextEditingController> textctl_env_name = [];
