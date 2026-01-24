@@ -321,7 +321,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                           .ext_defs![cur_app_base] ?? [];
         }
 
-        // 页面构建时存储应用对应的扩展列表
+        // 页面构建时存储应用对应的扩展列表, 这里强制非空防止UI构建时出现空异常
         List <Extension> ext_list_app_builder = ext_list_app ?? [];
         
         /*------------------------------------------------------------*/
