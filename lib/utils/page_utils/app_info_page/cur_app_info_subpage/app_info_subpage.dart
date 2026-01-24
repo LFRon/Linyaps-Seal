@@ -187,17 +187,21 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
   }
 
   // 环境变量: 当用户修改子页面的字典键时所修改的内容
-  Future <void> ConfigEnv_updateKey (int index, String newKey) async {
+  // 若newKey合法或无重复则合法, 返回true, 否则返回false
+  Future <bool> ConfigEnv_updateKey (int index, String newKey) async {
     // 注: 此时字典必定被初始化
     // 否则用户不可能通过下面的文本控制器触发这个函数
+
+    // 先检查字典键是否为空
+    if (newKey == '') return false;
 
     // 获取旧键的键和值
     var key_old = env_app!.keys.elementAt(index);
     var value_get = env_app!.values.elementAt(index);
 
     // 检查用户临时更改的新键是否重复
-    // 如果重复则不进行任何操作
-    if (env_app!.containsKey(newKey)) return;
+    // 如果重复则返回false
+    if (env_app!.containsKey(newKey)) return false;
 
     env_app!.remove(key_old);  // 移除旧键
     env_app![newKey] = value_get;  // 给新键赋上新值
@@ -205,7 +209,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
     gAppConf.update();  // 触发响应式更新
     // 保存并写入配置
     await LinyapsCliHelper.write_linyaps_app_config();
-    return;
+    return true;
   }
 
   // 环境变量: 当用户修改子页面的字典值时所修改的内容
@@ -530,7 +534,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                                       textctl_env_name: textctl_env_name_list[index],
                                       textctl_env_value: textctl_env_value_list[index],
                                       updateEnvKey: (curIndex, newKey) async {
-                                        await ConfigEnv_updateKey(curIndex, newKey);
+                                        return await ConfigEnv_updateKey(curIndex, newKey);
                                       },
                                       updateEnvValue: (curIndex, newValue) async {
                                         await ConfigEnv_updateValue(curIndex, newValue);
