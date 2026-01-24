@@ -210,7 +210,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   /*---------------------环境变量部分-----------------------*/
 
   // 存储当前全局变量
-  Map <String, String>? get global_env => gAppConf.global_config.value.env;
+  Map <String, String>? get env_global => gAppConf.global_config.value.env;
 
   // 声明对应修改环境变量需要的文本控制器
   List <TextEditingController> textctl_env_name = [];
@@ -219,13 +219,13 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   // 获取当前全局变量信息
   Future <void> ConfigEnv_initial () async {
     // 先使用临时变量获取当前全局变量信息
-    Map <String, String> global_env_get = gAppConf.global_config.value.env ?? {};
+    Map <String, String> env_global_get = gAppConf.global_config.value.env ?? {};
 
     // 更新对应修改环境变量的文本控制器
     if (mounted) setState(() {
       // 初始化对应修改环境变量的文本控制器
-      if (global_env_get.isNotEmpty) {
-        global_env_get.forEach((key, value) {
+      if (env_global_get.isNotEmpty) {
+        env_global_get.forEach((key, value) {
           textctl_env_name.add(
             TextEditingController(
               text: key,
@@ -244,21 +244,18 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   // 环境变量: 当用户更改环境变量键时自动触发保存的函数
   // 当该键无重复(合法)时返回true, 非法时返回false
   Future <bool> ConfigEnv_updateEnvKey (int index, String key) async {
-    var oldKey = global_env!.keys.elementAt(index);
-    var value = global_env!.values.elementAt(index);
+    var oldKey = env_global!.keys.elementAt(index);
+    var value = env_global!.values.elementAt(index);
 
-    // 检查新键是否已经存在, 若存在则不进行任何操作
-    if (
-      gAppConf.global_config.value
-      .env!.containsKey(key)
-    ) return false;
+    // 检查新键是否合法, 若非法(为空或重复)则不进行任何操作
+    if (!env_global!.containsKey(key) || key == '') return false;
+
+    // 若新键合法则进行操作
 
     // 移除旧的字典信息
-    gAppConf.global_config.value
-    .env!.remove(oldKey);
+    env_global!.remove(oldKey);
     // 增加新的字典信息
-    gAppConf.global_config.value
-    .env!.addAll({
+    env_global!.addAll({
       key: value,
     });
     await LinyapsCliHelper.write_linyaps_global_config();
@@ -266,6 +263,19 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
       gAppConf.update();
     });
     return true;
+  }
+
+  // 环境变量: 当用户更改环境变量值时自动触发保存的函数
+  Future <void> ConfigEnv_updateEnvValue (int index, String newValue) async {
+    var key = env_global!.keys.elementAt(index);
+    // 增加新的字典信息
+    gAppConf.global_config.value
+    .env![key] = newValue;
+    await LinyapsCliHelper.write_linyaps_global_config();
+    if (mounted) setState(() {
+      gAppConf.update();
+    });
+    return;
   }
 
   // 环境变量: 当用户按下新建按钮新建环境变量时触发的函数
@@ -279,7 +289,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
       return;
     } else {
       // 添加新的环境变量
-      global_env!.addAll({
+      env_global!.addAll({
         '': '',
       });
       if (mounted) setState(() {
@@ -299,24 +309,11 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     }
   }
 
-  // 环境变量: 当用户更改环境变量值时自动触发保存的函数
-  Future <void> ConfigEnv_updateEnvValue (int index, String newValue) async {
-    var key = global_env!.keys.elementAt(index);
-    // 增加新的字典信息
-    gAppConf.global_config.value
-    .env![key] = newValue;
-    await LinyapsCliHelper.write_linyaps_global_config();
-    if (mounted) setState(() {
-      gAppConf.update();
-    });
-    return;
-  }
-
   // 环境变量: 当用户按下子控件中的删除按钮时删除对应环境变量的函数
   Future <void> ConfigEnv_deleteEnv (int index) async {
-    var key = global_env!.keys.elementAt(index);
+    var key = env_global!.keys.elementAt(index);
     // 删除对应环境变量
-    global_env!.remove(key);
+    env_global!.remove(key);
     // 删除对应环境变量的文本控制器
     textctl_env_name.removeAt(index);
     textctl_env_value.removeAt(index);
@@ -483,22 +480,22 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                           ],
                         ),
                         const SizedBox(height: 10,),
-                        global_env != null
-                        ? global_env!.isNotEmpty
+                        env_global != null
+                        ? env_global!.isNotEmpty
                           ? YaruBorderContainer(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
-                                itemCount: global_env == null
+                                itemCount: env_global == null
                                            ? 0
-                                           : global_env!.length,
+                                           : env_global!.length,
                                 itemBuilder:(context, index) {
                                   return GlobalAppUI_Env(
                                     index: index, 
-                                    name: global_env!.keys.elementAt(index),
-                                    value: global_env!.values.elementAt(index),
+                                    name: env_global!.keys.elementAt(index),
+                                    value: env_global!.values.elementAt(index),
                                     textctl_name: textctl_env_name[index],
                                     textctl_value: textctl_env_value[index],
                                     updateKey:(index_in, newKey) async {

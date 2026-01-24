@@ -101,13 +101,7 @@ class _GlobalAppUI_EnvState extends State<GlobalAppUI_Env> {
                     height: 1.3
                   ),
                   onChanged: (key) async {
-                    bool isKeyValidGet = true;
-                    // 额外检查当前键是否为空, 为空直接不让过
-                    if (key.isNotEmpty) {
-                      isKeyValidGet = await widget.updateKey(widget.index, key);
-                    } else {
-                      isKeyValidGet = false;
-                    }
+                    bool isKeyValidGet = await widget.updateKey(widget.index, key);
                     // 触发页面重构判断当前键是否合法
                     if (context.mounted) setState(() {
                       is_key_valid = isKeyValidGet;
