@@ -10,7 +10,6 @@ import 'package:linyaps_seal/utils/Backend_API/Linyaps_CLI_API/linyaps_cli_helpe
 import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
 import 'package:linyaps_seal/utils/config_classes/config_cur_app.dart';
-import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 import 'package:linyaps_seal/utils/config_classes/linyaps_package_info.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/buttons/button_createItem.dart';
@@ -50,52 +49,48 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
 
   /*----------------------扩展部分-------------------------*/
 
+  // 声明当前应用扩展列表的指针
+  List <Extension>? get ext_list_app => gAppConf
+                                        .curAppConf.value
+                                        .ext_defs;
+  set ext_list_app (List <Extension>? value) {
+    gAppConf
+    .curAppConf.value
+    .ext_defs = value;
+  }
+
   // 声明当前应用自身加载的扩展文本控制器
   List <TextEditingController> textctl_ext_name_list = [];
   List <TextEditingController> textctl_ext_version_list = [];
 
   // 初始化扩展内应用文本控制器方法
-  Future <void> ConfigExt_initTextCtl () async {
-    Map <String, Config_Extension>? app_ext_defs = gAppConf
-                                                  .curAppConf.value
-                                                  .ext_defs ?? {};
-    // 同时获取应用当前扩展列表
-    List <Extension> ext_list_app = [];
-    // 如果发现当前应用有扩展, 则获取扩展信息
-    if (app_ext_defs.isNotEmpty) {
-      if (app_ext_defs[curAppInfo.id] != null) {
-        ext_list_app = app_ext_defs[curAppInfo.id]!.extensions_list;
-      }
-    }
+  Future <void> ConfigExt_initTextCtl () async {    
 
     // 若应用当前扩展列表不为空, 则初始化对应index的文本控制器
-    if (ext_list_app.isNotEmpty) {
-      for (var i in ext_list_app) {
-        textctl_ext_name_list.add(TextEditingController(text: i.name));
-        textctl_ext_version_list.add(TextEditingController(text: i.version));
+    if (ext_list_app != null) {
+      if (ext_list_app!.isNotEmpty) {
+        for (var i in ext_list_app!) {
+          textctl_ext_name_list.add(TextEditingController(text: i.name));
+          textctl_ext_version_list.add(TextEditingController(text: i.version));
+        }
       }
     }
+    
     return;
   }
 
   // 新建按钮新建扩展时触发的方法
   Future <void> ConfigExt_createExt () async {
-    // 通过空检查后新建扩展元素
-    if (curAppConf.value.ext_defs != null) {
-      if (curAppConf.value.ext_defs![curAppInfo.id] != null) {
-        curAppConf.value
-        .ext_defs![curAppInfo.id]!
-        .extensions_list
-        .add(
-          Extension(
-            name: '', 
-            version: '', 
-            directory: '',
-          )
-        );
-        gAppConf.update();  // 触发响应式更新
-      }
-    }
+    // 如果全局扩展列表配置未初始化则初始化
+    ext_list_app ??= [];
+    ext_list_app!.add(
+      Extension(
+        name: '', 
+        version: '', 
+        directory: '',
+      ),
+    );
+    gAppConf.update();  // 触发响应式更新
     if (mounted) setState(() {
       // 对应文本控制器列表也进行新建
       textctl_ext_name_list.add(TextEditingController(text: ''));
@@ -106,21 +101,11 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
 
   // 更新并写入新的扩展信息
   Future <void> ConfigExt_updateExtInfo (int index, String name, String version) async {
-    List <Extension> ext_list_app = [];
-
-    // 如果存在应用当前扩展配置信息则获取
-    if (curAppConf.value.ext_defs != null) {
-      if (curAppConf.value.ext_defs![curAppInfo.id] != null) {
-        ext_list_app = curAppConf.value.ext_defs![curAppInfo.id]!.extensions_list;
-      }
-    }
 
     // 更新扩展信息
-    ext_list_app[index].name = name;
-    ext_list_app[index].version = version;
-
-    // 更新扩展配置信息并通知重构UI
-    curAppConf.value.ext_defs![curAppInfo.id]!.extensions_list = ext_list_app;
+    // 这时直接空检查, 是因为用户只可能在列表有元素时进行修改
+    ext_list_app![index].name = name;
+    ext_list_app![index].version = version;
     gAppConf.update();
 
     // 写入配置信息
@@ -132,14 +117,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
   Future <void> ConfigExt_deleteExt (int index) async {
 
     // 如果存在应用当前扩展配置信息则获取并删除
-    if (curAppConf.value.ext_defs != null) {
-      if (curAppConf.value.ext_defs![curAppInfo.id] != null) {
-        curAppConf.value
-        .ext_defs![curAppInfo.id]!
-        .extensions_list
-        .removeAt(index);
-      }
-    }
+    ext_list_app!.removeAt(index);
 
     // 更新扩展配置信息并通知重构UI
     gAppConf.update();
@@ -163,10 +141,16 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
   // 存储当前全局环境变量的指针
   Map <String, String>? get env_global => gConf.global_config.value
                                           .env;
+  set env_global (Map <String, String>? value) {
+    gConf.global_config.value.env = value;
+  }
 
   // 存储当前应用的环境变量指针
   Map <String, String>? get env_app => gAppConf.curAppConf.value
                                        .env;
+  set env_app (Map <String, String>? value) {
+    gAppConf.curAppConf.value.env = value;
+  }
 
   // 声明环境变量用的文本控制器                                     
   late List <TextEditingController> textctl_env_name_list;
@@ -190,9 +174,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
   // 对应应用的环境变量时触发的方法
   Future <void> ConfigEnv_createItem () async {
     // 如果字典未初始化则进行初始化
-    if (curAppConf.value.env == null) {
-      curAppConf.value.env = {};
-    }
+    env_app ??= {};
     // 新建键值对
     if (!env_app!.containsKey('')) {
       curAppConf.value.env![''] = '';
@@ -331,23 +313,16 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
 
         // 在Builder内获取Base扩展信息
         String cur_app_base = curAppInfo.base;
-        Map <String, Config_Extension>? app_ext_defs = gAppBuilder
-                                                       .curAppConf.value
-                                                       .ext_defs ?? {};
-        // 页面构建时存储应用对应Base扩展的列表
-        List <Extension> ext_list_base = [];
-        // 如果对应应用有加载了base, 即获取不为空
-        if (app_ext_defs[cur_app_base] != null) {
-          ext_list_base = app_ext_defs[cur_app_base]!.extensions_list;
+
+        // 页面构建时存储应用对应Base扩展的列表, 这里强制非空防止UI构建时出现空异常
+        List <Extension> ext_list_base_builder = [];
+        if (gConf.global_config.value.ext_defs != null) {
+          ext_list_base_builder = gConf.global_config.value
+                          .ext_defs![cur_app_base] ?? [];
         }
-        // 同时获取应用当前扩展列表
-        List <Extension> ext_list_app = [];
-        // 如果发现当前应用有扩展, 则获取其扩展信息
-        if (app_ext_defs.isNotEmpty) {
-          if (app_ext_defs[curAppInfo.id] != null) {
-            ext_list_app = app_ext_defs[curAppInfo.id]!.extensions_list;
-          }
-        } 
+
+        // 页面构建时存储应用对应的扩展列表
+        List <Extension> ext_list_app_builder = ext_list_app ?? [];
         
         /*------------------------------------------------------------*/
 
@@ -622,15 +597,15 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                             ),
                             const SizedBox(height: 5,),
                             // 渲染对应Base的扩展列表
-                            ext_list_base.isNotEmpty
+                            ext_list_base_builder.isNotEmpty
                             ? ListView.builder(
                               shrinkWrap: true,
                               // 禁止子列表滚动
                               physics: NeverScrollableScrollPhysics(),
-                              itemCount: ext_list_base.length,
+                              itemCount: ext_list_base_builder.length,
                               itemBuilder:(context, index) {
                                 return AppInfoPage_ExtWidget_Base(
-                                  cur_base_ext: ext_list_base[index],
+                                  cur_base_ext: ext_list_base_builder[index],
                                   index: index,
                                 );
                               },  
@@ -668,15 +643,15 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                               ],
                             ),
                             const SizedBox(height: 5,),
-                            ext_list_app.isNotEmpty
+                            ext_list_app_builder.isNotEmpty
                             ? ListView.builder(
                               shrinkWrap: true,
                               // 禁止子列表滚动
                               physics: NeverScrollableScrollPhysics(),
-                              itemCount: ext_list_app.length,
+                              itemCount: ext_list_app_builder.length,
                               itemBuilder:(context, index) {
                                 return AppInfoPage_ExtListWidget_App(
-                                  cur_ext_info: ext_list_app[index], 
+                                  cur_ext_info: ext_list_app_builder[index], 
                                   textctl_ext_name: textctl_ext_name_list[index],
                                   textctl_ext_version: textctl_ext_version_list[index],
                                   index: index,

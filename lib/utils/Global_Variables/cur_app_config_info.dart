@@ -6,7 +6,7 @@
 import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/Backend_API/Linyaps_AppManager_API/linyaps_package_helper.dart';
 import 'package:linyaps_seal/utils/config_classes/config_cur_app.dart';
-import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
+import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 import 'package:linyaps_seal/utils/config_classes/linyaps_package_info.dart';
 
 class GlobalAppState_AppConfig extends GetxController {  
@@ -46,16 +46,18 @@ class GlobalAppState_AppConfig extends GetxController {
     update();
 
     // 先更新扩展部分
-    Map <String, Config_Extension>? cur_app_ext_conf = await LinyapsPackageHelper.get_config_extension_app(
+    List <Extension>? cur_app_ext_conf = await LinyapsPackageHelper.get_config_extension_app(
       newAppInfo,
     );
-    curAppConf.value.ext_defs = cur_app_ext_conf;
+    curAppConf.value
+    .ext_defs = cur_app_ext_conf;
 
     // 再更新环境变量部分
     Map <String, String>? cur_app_env_conf = await LinyapsPackageHelper.get_env_config_app(
       newAppInfo,
     );
-    curAppConf.value.env = cur_app_env_conf;
+    curAppConf.value
+    .env = cur_app_env_conf;
 
     // TODO: 去做新加别的配置功能
 

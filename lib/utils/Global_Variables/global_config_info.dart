@@ -6,7 +6,6 @@
 import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/Backend_API/Linyaps_AppManager_API/linyaps_package_helper.dart';
 import 'package:linyaps_seal/utils/config_classes/config_all_global.dart';
-import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
 
 class GlobalAppState_Config extends GetxController {
 
@@ -15,10 +14,9 @@ class GlobalAppState_Config extends GetxController {
 
   // 用于更新已存在的玲珑全局配置
   Future <void> updateGlobalConfig () async {
-
     // 先更新扩展部分
-    List <Config_Extension> global_extension_config = await LinyapsPackageHelper.get_config_extension_global ();
-    if (global_extension_config.isNotEmpty) {
+    var global_extension_config = await LinyapsPackageHelper.get_config_extension_global();
+    if (global_extension_config != null) {
       global_config.value.ext_defs = global_extension_config.obs;
     }
 

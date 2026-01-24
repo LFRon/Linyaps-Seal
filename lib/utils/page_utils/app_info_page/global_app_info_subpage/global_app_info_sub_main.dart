@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/Backend_API/Linyaps_CLI_API/linyaps_cli_helper.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
-import 'package:linyaps_seal/utils/config_classes/config_all_global.dart';
-import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/buttons/button_createItem.dart';
 import 'package:linyaps_seal/utils/page_utils/app_info_page/buttons/button_deleteItem.dart';
@@ -32,10 +30,15 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   // 用于判断扩展信息是否加载完全的状态管理, 默认为假
   bool is_info_loaded = false;
 
-  // 存储全局配置信息
-  late ConfigAll_Global global_config_info;
+  /*-----------------------------扩展配置部分---------------------------------*/
 
-  /*-------------------扩展配置部分-----------------------*/
+  // 初始化指向全局扩展列表的指针
+  Map<String, List<Extension>>? get ext_defs => gAppConf.global_config.value
+                                                .ext_defs; 
+  set ext_defs (Map<String, List<Extension>>? value) {
+    gAppConf.global_config.value
+    .ext_defs = value;
+  }
 
   // 声明新建Base扩展的按钮
   late MyButton_CreateItem createBaseExtensionButton;
@@ -50,19 +53,25 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
 
   // 扩展: 初始化每个扩展名字与版本的文本控制器列表
   Future <void> ConfigExt_initTextCtlList () async {
-    for (var i in gAppConf.global_config.value.ext_defs ?? <Config_Extension>[]) {
-      textctl_ext_name_list[i.appId] = [];   // 初始化各文本控制器
-      textctl_ext_base_list.add(
-        TextEditingController(text: i.appId),
-      );
-      textctl_ext_version_list[i.appId] = [];
-      for (var j in i.extensions_list) {
-        textctl_ext_name_list[i.appId]!.add(
-          TextEditingController(text: j.name),
-        );
-        textctl_ext_version_list[i.appId]!.add(
-          TextEditingController(text: j.version),
-        );
+
+    // 进行扩展信息空检查, 若为空直接跳过
+    if (ext_defs != null) {
+      if (ext_defs!.isNotEmpty) {
+        ext_defs!.forEach((key, value) async {
+          // 先初始化Base的文本控制器
+          textctl_ext_base_list.add(TextEditingController(text: key));
+          // 再初始化各文本控制器
+          textctl_ext_name_list[key] = [];   
+          textctl_ext_version_list[key] = [];
+          for (var i in value) {
+            textctl_ext_name_list[key]!.add(
+              TextEditingController(text: i.name),
+            );
+            textctl_ext_version_list[key]!.add(
+              TextEditingController(text: i.version),
+            );
+          }
+        });
       }
     }
     return;
@@ -72,14 +81,11 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   Future <void> ConfigExt_updateBaseInfo (String new_base_name, int index) async {
     
     // 存储原先oldBase的名字
-    String oldBaseName = gAppConf.global_config.value
-    .ext_defs![index]
-    .appId;
+    String oldBaseName = ext_defs!.keys.elementAt(index);
 
-    // 更新base信息
-    gAppConf.global_config.value
-    .ext_defs![index]
-    .appId = new_base_name;
+    // 更新base信息, 并移除旧base信息
+    ext_defs![new_base_name] = ext_defs![oldBaseName]!;
+    ext_defs!.remove(oldBaseName);
 
     // 分别更新extension子项内名字与版本文本控制器
     if (textctl_ext_name_list.containsKey(oldBaseName)) {
@@ -98,13 +104,19 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     return;
   }
 
+  // 扩展: 当用户在每个Base里更改其中扩展名字时触发的函数
+  Future <void> ConfigExt_updateExtBaseName (String base, String newName, int ext_index) async {
+    // 当用户能更改时一定是有对应文本框, 故这两者一定为真
+    ext_defs![base]![ext_index].name = newName;
+    gAppConf.update();  // 触发响应式更新
+    await LinyapsCliHelper.write_linyaps_global_config();   // 写入新配置
+    return;
+  }
+
   // 扩展: 当用户按下Base旁边的'+'号时触发的函数
   Future <void> ConfigExt_createNewBase () async {
     // 如果为ext_refs为空值则初始化
-    if (gAppConf.global_config.value.ext_defs == null) {
-      gAppConf.global_config.value
-      .ext_defs = <Config_Extension>[].obs;
-    } 
+    ext_defs ??= {};
     if (mounted) setState(() {
       // 添加新的对应文本控制器
       textctl_ext_base_list.add(
@@ -113,106 +125,60 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
         ),
       );
       // 添加新的Base信息
-      gAppConf.global_config.value
-      .ext_defs!
-      .add(
-        Config_Extension(
-          appId: '', 
-          extensions_list: [],
-        )
-      );
+      ext_defs![''] = [];
+      gAppConf.update();
     });
     return;
   }
 
   // 扩展: 当用户按下Extension旁边的'+'号时触发的函数
-  // 这里之所以只需要传参index, 是因为实际存储时是用列表
-  // 在存储时, 每个Base对应一个列表, 所以只需要知道Base的索引即可
-  Future <void> ConfigExt_createNewExt (int index) async {
-    // 如果为ext_refs为空值则初始化
-    if (gAppConf.global_config.value.ext_defs == null) {
-      gAppConf.global_config.value
-      .ext_defs = <Config_Extension>[].obs;
-    } 
+  Future <void> ConfigExt_createNewExt (String base) async {
+    // 如果为ext_refs, 文本控制器为空值则初始化
+    ext_defs![base] ??= [];
+    textctl_ext_name_list[base] ??= [];
+    textctl_ext_version_list[base] ??= [];
 
     if (mounted) setState(() {
-      // 如果对应控制器未初始化则进行初始化
-      if (
-        textctl_ext_name_list[
-          gAppConf.global_config.value
-          .ext_defs![index]
-          .appId
-        ] == null
-      ) {
-        textctl_ext_name_list[
-          gAppConf.global_config.value
-          .ext_defs![index]
-          .appId
-        ] = [];
-      }
-      if (
-        textctl_ext_version_list[
-          gAppConf.global_config.value
-          .ext_defs![index]
-          .appId
-        ] == null
-      ) {
-        textctl_ext_version_list[
-          gAppConf.global_config.value
-          .ext_defs![index]
-          .appId
-        ] = [];
-      }
-      // 添加新的对应文本控制器
-      textctl_ext_name_list[
-        gAppConf.global_config.value
-        .ext_defs![index]
-        .appId
-      ]!.add(
-        TextEditingController(
-          text: '',
-        ),
-      );
-      textctl_ext_version_list[
-        gAppConf.global_config.value
-        .ext_defs![index]
-        .appId
-      ]!.add(
-        TextEditingController(
-          text: '',
-        ),
-      );
-      // 添加新的Extension信息
-      gAppConf.global_config.value
-      .ext_defs![index]
-      .extensions_list
-      .add(
+      ext_defs![base]!.add(
         Extension(
           name: '', 
           version: '',
           directory: '',
-        )
+        ),
+      );
+      textctl_ext_name_list[base]!.add(
+        TextEditingController(text: ''),
+      );
+      textctl_ext_version_list[base]!.add(
+        TextEditingController(text: ''),
       );
     });
     gAppConf.update();  // 触发响应式更新
     return;
   }
 
-  // 扩展: 用户更改Base下扩展名字/版本号时及时写入
-  // 这里使用index是因为会在下方构建树里直接传出对应元素列表的索引
-  // 故index是扩展名字/版本号列表的索引
-  Future <void> ConfigExt_writeExtionInfo () async {
+  // 扩展: 用户更改Base下扩展名字/版本号时及时写入的两实现
+  Future <void> ConfigExt_updateBaseExtName (String base, String newName, int ext_index) async {
+    // 当用户能更改时一定是有对应文本框, 故这两者一定为真
+    ext_defs![base]![ext_index].name = newName;
+    await LinyapsCliHelper.write_linyaps_global_config();   // 写入新配置
+    gAppConf.update();  // 触发响应式更新
+    return;
+  }
+  Future <void> ConfigExt_updateBaseExtVersion (String base, String newVersion, int ext_index) async {
+    // 当用户能更改时一定是有对应文本框, 故这两者一定为真
+    ext_defs![base]![ext_index].version = newVersion;
+    gAppConf.update();  // 触发响应式更新
     await LinyapsCliHelper.write_linyaps_global_config();   // 写入新配置
     return;
   }
 
   // 扩展: 删除用户对应Base
-  Future <void> ConfigExt_deleteBase (String base, int index) async {
+  Future <void> ConfigExt_deleteBase (int index) async {
     if (mounted) setState(() {
-      // 删除对应Base
-      gAppConf.global_config.value
-      .ext_defs!
-      .removeAt(index);
+      // 获取对应键
+      String base = ext_defs!.keys.elementAt(index);
+      ext_defs!.remove(base);
       // 删除对应Base的文本控制器
       textctl_ext_base_list.removeAt(index);
       // 删除与对应Base相关的所有扩展控制器
@@ -225,13 +191,10 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   }
 
   // 扩展: 删除用户指定Base中的指定扩展
-  Future <void> ConfigExt_deleteExt (String base,int base_index, int ext_index) async {
+  Future <void> ConfigExt_deleteExt (String base, int ext_index) async {
     if (mounted) setState(() {
       // 删除对应Base
-      gAppConf.global_config.value
-      .ext_defs![base_index]
-      .extensions_list
-      .removeAt(ext_index);
+      ext_defs![base]!.removeAt(ext_index);
       // 删除对应Base的文本控制器
       textctl_ext_name_list[base]!.removeAt(ext_index);
       textctl_ext_version_list[base]!.removeAt(ext_index);
@@ -419,6 +382,16 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
 
     return GetBuilder<GlobalAppState_Config>(
       builder:(gAppBuild) {
+
+        /*----------------获取扩展部分----------------*/
+        // 获取构建时扩展信息
+        // 涉及到列表渲染时需强制非空防止UI时出现问题
+        Map <String, List<Extension>> ext_defs_build = gAppBuild.global_config.value
+                                                       .ext_defs ?? {};
+
+        /*----------------环境变量部分----------------*/
+        // 获取构建时环境变量信息
+
         return Padding(
           padding: const EdgeInsets.only(top: 28.0, left: 35, right: 35),
           child: ListView(
@@ -578,11 +551,10 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                           child: ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),  // 禁止子控件滚动
-                            itemCount: gAppBuild.global_config.value
-                                       .ext_defs == null
-                            ? 0
-                            : gAppBuild.global_config.value.ext_defs!.length,
+                            itemCount: ext_defs_build.length,
                             itemBuilder:(context, index) {
+                              // 获取当前Base信息
+                              String cur_base = ext_defs_build.keys.elementAt(index);
                               return Padding(
                                 padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0, bottom: 8.0),
                                 child: Column(
@@ -623,12 +595,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                                           width: 30,
                                           child: MyButton_DeleteItem(
                                             onPressed: () async {
-                                              await ConfigExt_deleteBase(
-                                                gAppBuild.global_config.value
-                                                .ext_defs![index]
-                                                .appId,
-                                                index
-                                              );
+                                              await ConfigExt_deleteBase(index);
                                             }
                                           ),
                                         ),
@@ -638,36 +605,69 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                                           width: 30,
                                           child: MyButton_CreateItem(
                                             canPress: ValueNotifier<bool>(
-                                              gAppBuild.global_config.value.ext_defs![index].appId.isNotEmpty
+                                              !ext_defs_build.containsKey('')
                                             ),
                                             onPressed: () async {
-                                              await ConfigExt_createNewExt(index);
+                                              await ConfigExt_createNewExt(cur_base);
                                             }
                                           ),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 10,),
-                                    GlobalAppUI_Extensions(
-                                      base_index: index,
-                                      textctl_name_list: textctl_ext_name_list[
-                                        gAppBuild.global_config.value
-                                        .ext_defs![index].appId
-                                      ] ?? [],
-                                      textctl_version_list: textctl_ext_version_list[
-                                        gAppBuild.global_config.value
-                                        .ext_defs![index].appId
-                                      ] ?? [],
-                                      writeExtensionInfo: () async {
-                                        await ConfigExt_writeExtionInfo();
-                                      },
-                                      deleteExtensionInfo: (base, ext_index) async {
-                                        await ConfigExt_deleteExt(
-                                          base, 
-                                          index,
-                                          ext_index,
-                                        );
-                                      },
+                                    // 检查对应Base扩展列表是否为Nul或空
+                                    // 如果为Null/空则显示暂无扩展标识
+                                    ext_defs_build[cur_base] != null
+                                    ? ext_defs_build[cur_base]!.isNotEmpty
+                                      ? ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(), // 禁用ListView的滚动
+                                        itemCount: ext_defs_build[cur_base]!.length,
+                                        itemBuilder: (context, index) {
+                                          return GlobalAppUI_Extensions(
+                                            cur_base: cur_base,
+                                            cur_index: index,
+                                            cur_ext_info: ext_defs_build[cur_base]![index],
+                                            textctl_name: textctl_ext_name_list[cur_base]![index],
+                                            textctl_version: textctl_ext_version_list[cur_base]![index],
+                                            updateExtensionName: (base, ext_index, newExtName) async {
+                                              await ConfigExt_updateBaseExtName(
+                                                base, 
+                                                newExtName, 
+                                                ext_index,
+                                              );
+                                            },
+                                            updateExtensionVersion: (base, ext_index, newExtVersion) async {
+                                              await ConfigExt_updateBaseExtVersion(
+                                                base, 
+                                                newExtVersion, 
+                                                ext_index,
+                                              );
+                                            },
+                                            deleteExtensionInfo: (base, ext_index) async {
+                                              await ConfigExt_deleteExt(
+                                                base, 
+                                                ext_index,
+                                              );
+                                            },
+                                          );
+                                        }
+                                      )
+                                      : Center(
+                                        child: Text(
+                                          '暂无扩展',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      )
+                                    : Center(
+                                      child: Text(
+                                        '暂无扩展',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

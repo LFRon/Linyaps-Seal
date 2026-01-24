@@ -3,12 +3,11 @@
 // 关闭VSCode非必要报错
 // ignore_for_file: camel_case_types, non_constant_identifier_names
 
-import 'package:get/get.dart';
-import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
+import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 
 class ConfigAll_Global {
 
-  RxList <Config_Extension>? ext_defs;  // 总扩展信息
+  Map <String, List<Extension>>? ext_defs;  // 总扩展信息
   Map <String, String>? env;  // 环境变量信息
 
   ConfigAll_Global ({
@@ -21,8 +20,15 @@ class ConfigAll_Global {
     // 若用户设置了全局扩展, 则先处理全局扩展配置
     if (ext_defs != null) {
       returnItems["ext_defs"] = {};
-      for (var i in ext_defs ?? []) {
-        returnItems["ext_defs"].addAll(i.toMap());
+      for (String key in ext_defs!.keys) {
+        returnItems["ext_defs"]![key] = [];
+        for (Extension ext in ext_defs![key]!) {
+          returnItems["ext_defs"]![key]!.add({
+            'name': ext.name,
+            'version': ext.version,
+            'directory': '',
+          });
+        }
       }
     }
 

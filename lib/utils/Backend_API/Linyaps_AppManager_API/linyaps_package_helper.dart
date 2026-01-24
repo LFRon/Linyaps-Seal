@@ -3,9 +3,7 @@
 // 关闭VSCode非必要报错
 // ignore_for_file: non_constant_identifier_names, null_argument_to_non_null_type, curly_braces_in_flow_control_structures
 
-import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/Backend_API/Linyaps_CLI_API/linyaps_cli_helper.dart';
-import 'package:linyaps_seal/utils/config_classes/ext_defs/config_extension_info.dart';
 import 'package:linyaps_seal/utils/config_classes/ext_defs/linyaps_extension.dart';
 import 'package:linyaps_seal/utils/config_classes/linyaps_package_info.dart';
 
@@ -53,11 +51,11 @@ class LinyapsPackageHelper {
   // 因此返回格式为Map<String, List<Config_Extension>>
   // 其中key为1: Base名称, value为该Base下的所有扩展
   // 2: 是应用包名, value为该应用下的所有扩展
-  static Future <List<Config_Extension>> get_config_extension_global () async {
+  static Future <Map <String, List<Extension>>?> get_config_extension_global () async {
     // 先获取全局配置
     Map <String, dynamic>? app_config_get = await LinyapsCliHelper.get_linyaps_global_config();
     // 初始化待返回内容
-    List <Config_Extension> returnItems = [];
+    Map <String, List<Extension>> returnItems = {};
     if (app_config_get != null) {
       app_config_get["ext_defs"].forEach((key, value) {
         // 在循环内初始化待赋值的extensions列表
@@ -72,50 +70,34 @@ class LinyapsPackageHelper {
             ),
           );
         }
-        returnItems.add(
-          Config_Extension(
-            appId: base, 
-            extensions_list: extensions,
-          ),
-        );
+        returnItems[base] = extensions;
       });
       return returnItems;
     } else {
-      return [];
+      return null;
     }
   }
 
   // 获取应用单独配置信息的方法
-  // 由于玲珑App扩展加载机制是先加载Base扩展再加载App指定扩展
-  // 故需要先Map里存放对应base的扩展列表, 再存放对应App的扩展列表
-  static Future <Map<String, Config_Extension>?> get_config_extension_app (LinyapsPackageInfo appInfo) async {
+  // 只返回玲珑当前应用的列表
+  static Future <List<Extension>?> get_config_extension_app (LinyapsPackageInfo appInfo) async {
     // 先拆分出应用Base信息与扩展信息
     String app_base = appInfo.base;
     String appId = appInfo.id;
     // 先获取全局配置
     Map <String, dynamic>? app_config_get = await LinyapsCliHelper.get_linyaps_app_config(appId);
     // 初始化待返回内容
-    Map <String, Config_Extension>? returnItems = {};
-    // 先获取全局的扩展
-    List <Config_Extension> global_ext = await LinyapsPackageHelper.get_config_extension_global ();
-    // 先获取base加载的扩展
-    Config_Extension? base_ext_middleware = global_ext.firstWhereOrNull(
-      (element) => element.appId == app_base,
-    );
-    List <Extension> base_ext_list = [];
-    if (base_ext_middleware != null) {
-      base_ext_list = base_ext_middleware.extensions_list;
-    }
+    List<Extension>? returnItems;
 
-    // 初始化即将返回的单独应用扩展列表
-    List <Extension> app_ext_list = [];
     // 如果当前应用有对应的配置(也就是)
     if (app_config_get != null) {
       app_config_get["ext_defs"].forEach((key, value) async {
         if (key != app_base) return;  // 如果不是指定base, 那么扩展不会生效, 直接跳过所有
         else {
+          returnItems = [];
           for (var i in value) {
-            app_ext_list.add(
+            // 将扩展列表加入到待返回列表中
+            returnItems!.add(
               Extension(
                 name: i['name'], 
                 version: i['version'], 
@@ -126,15 +108,6 @@ class LinyapsPackageHelper {
         }
       });
     }
-    // 将结果加入至总的返回变量中
-    returnItems[app_base] = Config_Extension(
-      appId: app_base, 
-      extensions_list: base_ext_list,
-    );
-    returnItems[appId] = Config_Extension(
-      appId: appId, 
-      extensions_list: app_ext_list,
-    );
     return returnItems;
   }
 
