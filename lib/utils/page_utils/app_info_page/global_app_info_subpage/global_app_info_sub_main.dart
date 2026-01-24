@@ -242,7 +242,8 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   }
 
   // 环境变量: 当用户更改环境变量键时自动触发保存的函数
-  Future <void> ConfigEnv_updateEnvKey (int index, String key) async {
+  // 当该键无重复(合法)时返回true, 非法时返回false
+  Future <bool> ConfigEnv_updateEnvKey (int index, String key) async {
     var oldKey = global_env!.keys.elementAt(index);
     var value = global_env!.values.elementAt(index);
 
@@ -250,7 +251,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     if (
       gAppConf.global_config.value
       .env!.containsKey(key)
-    ) return;
+    ) return false;
 
     // 移除旧的字典信息
     gAppConf.global_config.value
@@ -264,7 +265,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     if (mounted) setState(() {
       gAppConf.update();
     });
-    return;
+    return true;
   }
 
   // 环境变量: 当用户按下新建按钮新建环境变量时触发的函数
@@ -501,7 +502,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                                     textctl_name: textctl_env_name[index],
                                     textctl_value: textctl_env_value[index],
                                     updateKey:(index_in, newKey) async {
-                                      await ConfigEnv_updateEnvKey(index_in, newKey);
+                                      return await ConfigEnv_updateEnvKey(index_in, newKey);
                                     }, 
                                     updateValue:(index_in, newValue) async {
                                       await ConfigEnv_updateEnvValue(index_in, newValue);
