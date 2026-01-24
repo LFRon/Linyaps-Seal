@@ -650,18 +650,23 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: ext_list_app_builder.length,
                               itemBuilder:(context, index) {
-                                return AppInfoPage_ExtListWidget_App(
-                                  cur_ext_info: ext_list_app_builder[index], 
-                                  textctl_ext_name: textctl_ext_name_list[index],
-                                  textctl_ext_version: textctl_ext_version_list[index],
-                                  index: index,
-                                  updateExtInfo: (index, name, version) async {
-                                    await ConfigExt_updateExtInfo(index, name, version);
-                                  },
-                                  deleteExtInfo:(index) async {
-                                    await ConfigExt_deleteExt(index);
-                                  },
-                                );
+                                // 通过捕捉异常修复子页面类加载过早问题
+                                try {
+                                  return AppInfoPage_ExtListWidget_App(
+                                    cur_ext_info: ext_list_app_builder[index], 
+                                    textctl_ext_name: textctl_ext_name_list[index],
+                                    textctl_ext_version: textctl_ext_version_list[index],
+                                    index: index,
+                                    updateExtInfo: (index, name, version) async {
+                                      await ConfigExt_updateExtInfo(index, name, version);
+                                    },
+                                    deleteExtInfo:(index) async {
+                                      await ConfigExt_deleteExt(index);
+                                    },
+                                  );
+                                } catch (e) {
+                                  return SizedBox.shrink();
+                                }
                               },  
                             )
                             : const SizedBox.shrink(),
