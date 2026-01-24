@@ -253,7 +253,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     var value = env_global!.values.elementAt(index);
 
     // 检查新键是否合法, 若非法(为空或重复)则不进行任何操作
-    if (!env_global!.containsKey(key) || key == '') return false;
+    if (env_global!.containsKey(key) || key == '') return false;
 
     // 若新键合法则进行操作
 
