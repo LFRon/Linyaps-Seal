@@ -33,10 +33,8 @@ class _MyAboutDialogState extends State<MyAboutDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: YaruTitleBar(
-        border: BorderSide(
-          color: Colors.transparent,
-          width: 0,
-        ),
+        border: BorderSide.none,
+        backgroundColor: Colors.transparent,
         isClosable: true,
         onClose: (_) {
           Navigator.of(context).pop();

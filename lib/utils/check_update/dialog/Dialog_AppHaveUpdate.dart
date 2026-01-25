@@ -20,7 +20,7 @@ class MyDialog_AppHaveUpdate extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       titlePadding: EdgeInsets.only(top:20,bottom: 20),
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).cardColor,
       title: Center(
         child: Text(
           "发现应用更新",
