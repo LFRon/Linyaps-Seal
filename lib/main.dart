@@ -12,6 +12,7 @@ import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/installed_apps.dart';
 import 'package:linyaps_seal/utils/Global_Variables/repo_arch.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:yaru/settings.dart';
 
 void main() async {
@@ -22,6 +23,12 @@ void main() async {
   // 如果不是, 则退出程序
   bool isSingleInstance = await FlutterSingleInstance().isFirstInstance();
   if (!isSingleInstance || !Platform.isLinux) exit(0);
+
+  // 确认Flutter初始化控件加载完成
+  WidgetsFlutterBinding.ensureInitialized();
+  // 确认WindowManager窗管控件加载完成
+  await windowManager.ensureInitialized();
+  
 
   // 初始化所有GetX管理的全局类实例
   // 创建GetX管理共享的ApplicationState实例
@@ -34,6 +41,17 @@ void main() async {
   GlobalAppState_Arch appGlobalInfo_arch = Get.find<GlobalAppState_Arch>();
   GlobalAppState_InstalledApps appGlobalInfo_installedApps = Get.find<GlobalAppState_InstalledApps>();
   GlobalAppState_Config appGlobalInfo_globalConf = Get.find<GlobalAppState_Config>();
+
+  // 设置当前应用窗口管理器
+  WindowOptions windowOptions = WindowOptions(
+    minimumSize: Size(1200, 720),
+  );
+
+  // 让当前应用窗口管理器生效
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 
   // 启动时更新系统架构信息
   await appGlobalInfo_arch.getUnameArch();
