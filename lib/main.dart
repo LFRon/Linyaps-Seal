@@ -26,7 +26,6 @@ void main() async {
 
   // 确认Flutter初始化控件加载完成
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.setMinimumSize(Size(1200, 600));
   // 确认WindowManager窗管控件加载完成
   await windowManager.ensureInitialized();
 
