@@ -26,8 +26,6 @@ void main() async {
 
   // 确认Flutter初始化控件加载完成
   WidgetsFlutterBinding.ensureInitialized();
-  // 确认WindowManager窗管控件加载完成
-  await windowManager.ensureInitialized();
 
   // 初始化所有GetX管理的全局类实例
   // 创建GetX管理共享的ApplicationState实例

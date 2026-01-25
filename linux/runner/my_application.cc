@@ -54,7 +54,10 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "linyaps_seal");
   }
 
+  // 设置当前GTK窗口默认尺寸
   gtk_window_set_default_size(window, 1280, 720);
+  // 设置当前GTK窗口默认尺寸
+  gtk_widget_set_size_request(GTK_WIDGET(window), 1200, 720);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(
