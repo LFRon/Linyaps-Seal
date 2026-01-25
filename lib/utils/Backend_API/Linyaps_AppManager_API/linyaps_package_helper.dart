@@ -24,7 +24,11 @@ class LinyapsPackageHelper {
     // 开始遍历本地的应用安装信息
     for (dynamic i in linyapsLocalInfo['layers']) {
       // 跳过玲珑Base和Runtime
-      if (i['info']['kind'] == 'base' || i['info']['kind'] == 'runtime') {
+      if (
+        i['info']['kind'] == 'base' || 
+        i['info']['kind'] == 'runtime' ||
+        i['info']['kind'] == 'extension'
+      ) {
         continue;
       }
       installedItems.add(
