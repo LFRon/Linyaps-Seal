@@ -28,7 +28,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // 确认WindowManager窗管控件加载完成
   await windowManager.ensureInitialized();
-  
 
   // 初始化所有GetX管理的全局类实例
   // 创建GetX管理共享的ApplicationState实例
@@ -45,12 +44,13 @@ void main() async {
   // 设置当前应用窗口管理器
   WindowOptions windowOptions = WindowOptions(
     minimumSize: Size(1200, 720),
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
   );
 
   // 让当前应用窗口管理器生效
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
-    await windowManager.focus();
   });
 
   // 启动时更新系统架构信息
