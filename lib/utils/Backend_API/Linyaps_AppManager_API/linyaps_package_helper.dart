@@ -89,24 +89,27 @@ class LinyapsPackageHelper {
     // 初始化待返回内容
     List<Extension>? returnItems;
 
-    // 如果当前应用有对应的配置(也就是)
+    // 如果当前应用有对应的配置
+    // (也就是app_config_get与app_config_get["ext_defs"]均非空)
     if (app_config_get != null) {
-      app_config_get["ext_defs"].forEach((key, value) async {
-        if (key != app_base) return;  // 如果不是指定base, 那么扩展不会生效, 直接跳过所有
-        else {
-          returnItems = [];
-          for (var i in value) {
-            // 将扩展列表加入到待返回列表中
-            returnItems!.add(
-              Extension(
-                name: i['name'], 
-                version: i['version'], 
-                directory: i['directory'],
-              ),
-            );
+      if (app_config_get["ext_defs"] != null) {
+        app_config_get["ext_defs"].forEach((key, value) async {
+          if (key != app_base) return;  // 如果不是指定base, 那么扩展不会生效, 直接跳过所有
+          else {
+            returnItems = [];
+            for (var i in value) {
+              // 将扩展列表加入到待返回列表中
+              returnItems!.add(
+                Extension(
+                  name: i['name'], 
+                  version: i['version'], 
+                  directory: i['directory'],
+                ),
+              );
+            }
           }
-        }
-      });
+        });
+      }
     }
     return returnItems;
   }
