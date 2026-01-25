@@ -41,18 +41,6 @@ void main() async {
   GlobalAppState_InstalledApps appGlobalInfo_installedApps = Get.find<GlobalAppState_InstalledApps>();
   GlobalAppState_Config appGlobalInfo_globalConf = Get.find<GlobalAppState_Config>();
 
-  // 设置当前应用窗口管理器
-  WindowOptions windowOptions = WindowOptions(
-    minimumSize: Size(1200, 720),
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden,
-  );
-
-  // 让当前应用窗口管理器生效
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-  });
-
   // 启动时更新系统架构信息
   await appGlobalInfo_arch.getUnameArch();
   await appGlobalInfo_arch.getLinyapsStoreApiArch();
