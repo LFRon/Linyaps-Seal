@@ -94,7 +94,7 @@ class LinyapsPackageHelper {
     if (app_config_get != null) {
       if (app_config_get["ext_defs"] != null) {
         app_config_get["ext_defs"].forEach((key, value) async {
-          if (key != app_base) return;  // 如果不是指定base, 那么扩展不会生效, 直接跳过所有
+          if (key != appInfo.id) return;  // 如果不是指应用id, 那么扩展不会生效, 直接跳过所有
           else {
             returnItems = [];
             for (var i in value) {

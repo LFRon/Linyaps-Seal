@@ -32,9 +32,9 @@ class ConfigAll_App {
       returnItems["ext_defs"] = {};
       if (ext_defs != null) {
         // 往待返回字典对应信息中按照JSON转制规范制作字典列表
-        returnItems["ext_defs"][curAppInfo.base] = [];
+        returnItems["ext_defs"][curAppInfo.id] = [];
         for (Extension ext in ext_defs!) {
-          returnItems["ext_defs"][curAppInfo.base].add({
+          returnItems["ext_defs"][curAppInfo.id].add({
             'name': ext.name,
             'version': ext.version,
             'directory': '',
