@@ -12,7 +12,6 @@ import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/installed_apps.dart';
 import 'package:linyaps_seal/utils/Global_Variables/repo_arch.dart';
-import 'package:window_manager/window_manager.dart';
 import 'package:yaru/settings.dart';
 
 void main() async {
