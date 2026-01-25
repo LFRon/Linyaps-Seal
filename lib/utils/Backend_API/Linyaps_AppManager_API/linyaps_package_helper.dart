@@ -81,8 +81,7 @@ class LinyapsPackageHelper {
   // 获取应用单独配置信息的方法
   // 只返回玲珑当前应用的列表
   static Future <List<Extension>?> get_config_extension_app (LinyapsPackageInfo appInfo) async {
-    // 先拆分出应用Base信息与扩展信息
-    String app_base = appInfo.base;
+    // 获取出应用id
     String appId = appInfo.id;
     // 先获取全局配置
     Map <String, dynamic>? app_config_get = await LinyapsCliHelper.get_linyaps_app_config(appId);

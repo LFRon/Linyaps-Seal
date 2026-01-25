@@ -10,6 +10,8 @@ import 'package:get/state_manager.dart';
 import 'package:linyaps_seal/pages/about_dialog/about_dialog.dart';
 import 'package:linyaps_seal/pages/app_info_page/app_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/installed_apps.dart';
+import 'package:linyaps_seal/utils/check_update/check_update.dart';
+import 'package:linyaps_seal/utils/check_update/dialog/Dialog_AppHaveUpdate.dart';
 import 'package:linyaps_seal/utils/connection_check/check_connection_status.dart';
 import 'package:linyaps_seal/utils/config_classes/linyaps_package_info.dart';
 import 'package:linyaps_seal/utils/page_utils/middle_page/app_bar.dart';
@@ -18,12 +20,16 @@ import 'package:yaru/widgets.dart';
 
 class MainMiddlePage extends StatefulWidget {
   const MainMiddlePage({super.key});
-
   @override
   State<MainMiddlePage> createState() => _MainMiddlePageState();
 }
 
 class _MainMiddlePageState extends State<MainMiddlePage> {
+
+  // 在当前页面检查应用是否有更新的方法
+  Future <bool> isAppHaveUpdate() async {
+    return await CheckAppUpdate.isAppHaveUpate();
+  }
 
   // 覆写父类构造函数
   @override
@@ -32,9 +38,25 @@ class _MainMiddlePageState extends State<MainMiddlePage> {
     // 拿到GetX全局对象
     GlobalAppState_InstalledApps globalinstalledAppList = Get.find<GlobalAppState_InstalledApps>();
     Future.microtask(() async {
-      // 检查网络连接状态, 若状态好则进行图标更新
-      if (await CheckInternetConnectionStatus.staus_is_good()) {
-        await globalinstalledAppList.updateAppsIcon();
+      // 检查网络连接状态
+      // 若状态好则同时进行图标更新与应用更新检查
+      bool is_connect_good = await CheckInternetConnectionStatus.staus_is_good();
+      if (is_connect_good) {
+        Future.microtask(() async {
+          await globalinstalledAppList.updateAppsIcon();
+        });
+        Future.microtask(() async {
+          if (await isAppHaveUpdate()) {
+            // 如果应用有更新就弹出对话框
+            if (mounted) showDialog(
+              context: context, 
+              barrierDismissible: false,    // 禁止用户按空白部分关掉对话框
+              builder: (BuildContext context) {
+                return MyDialog_AppHaveUpdate();
+              },
+            );
+          }
+        });
       }
     });
   }
