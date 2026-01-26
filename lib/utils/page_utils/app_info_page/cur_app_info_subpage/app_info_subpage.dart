@@ -353,7 +353,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                         CachedNetworkImage(
                           imageUrl: curAppInfo.Icon ?? '',
                           key: ValueKey(curAppInfo.name),
-                          height: 150,width: 150,
+                          height: 160,width: 160,
                           placeholder: (context, loadingProgress) {
                             return Center(
                               child: CircularProgressIndicator(
@@ -391,6 +391,12 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                             ),
                             Text(
                               '版本: ${curAppInfo.version}',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              '基础环境: ${curAppInfo.base}',
                               style: TextStyle(
                                 fontSize: 18,
                               ),
