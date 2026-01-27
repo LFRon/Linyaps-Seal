@@ -507,11 +507,13 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                                     // 是否能按下时, 需要检查用户是否
                                     // 已经新建了键为''的变量
                                     // 若新建了不能再让用户急需创建, 防止污染字典 
-                                    canPress: env_app == null
-                                              ? ValueNotifier<bool>(true) 
-                                              : env_app!.containsKey('')
-                                                ? ValueNotifier<bool>(false)
-                                                : ValueNotifier<bool>(true),
+                                    canPress: ValueNotifier<bool>(
+                                      env_app == null
+                                      ? true
+                                      : env_app!.containsKey('')
+                                        ? false
+                                        : true,
+                                    ),
                                     onPressed: () async {
                                       await ConfigEnv_createItem();
                                     }
