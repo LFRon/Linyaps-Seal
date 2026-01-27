@@ -330,7 +330,16 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
         
         /*------------------------------------------------------------*/
 
-        /*-----------------------环境变量部分-------------------------*/        
+        /*-----------------------环境变量部分-------------------------*/ 
+
+        // 页面构建时获取对应应用环境变量
+        // 强制非空防止UI构建时出现异常
+        Map <String, String> env_global_build = env_global ?? {};
+        Map <String, String> env_app_build = env_app ?? {};
+
+        /*------------------------------------------------------------*/
+
+        /*-----------------------UI界面构建部分-----------------------*/
 
         /*------------------------------------------------------------*/
 
@@ -456,21 +465,14 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                                 ),
                                 // 检查全局变量是否为空
                                 // 根据这个合理提示的UI渲染与提示
-                                env_global != null
-                                ? env_global!.isEmpty
-                                  ? Text(
-                                    '暂无',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                  )
-                                  : SizedBox.shrink()
-                                : Text(
+                                env_global_build.isEmpty
+                                ? Text(
                                   '暂无',
                                   style: TextStyle(
                                     fontSize: 18,
                                   ),
-                                ),
+                                )
+                                : SizedBox.shrink()
                               ],
                             ),
                             const SizedBox(height: 5,),
@@ -478,14 +480,14 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                               shrinkWrap: true,
                               // 禁止子列表滚动
                               physics: NeverScrollableScrollPhysics(),
-                              itemCount: env_global == null
+                              itemCount: env_global_build.isEmpty
                                          ? 0
-                                         : env_global!.length,
+                                         : env_global_build.length,
                               itemBuilder:(context, index) {
                                 return AppInfoPage_EnvWidget_Global(
                                   curIndex: index, 
-                                  curKey: env_global!.keys.elementAt(index), 
-                                  curValue: env_global!.values.elementAt(index),
+                                  curKey: env_global_build.keys.elementAt(index), 
+                                  curValue: env_global_build.values.elementAt(index),
                                 );
                               },
                             ),
@@ -508,11 +510,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                                     // 已经新建了键为''的变量
                                     // 若新建了不能再让用户急需创建, 防止污染字典 
                                     canPress: ValueNotifier<bool>(
-                                      env_app == null
-                                      ? true
-                                      : env_app!.containsKey('')
-                                        ? false
-                                        : true,
+                                      !env_app_build.containsKey(''),
                                     ),
                                     onPressed: () async {
                                       await ConfigEnv_createItem();
@@ -522,43 +520,39 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                               ],
                             ),
                             const SizedBox(height: 5,),
-                            env_app != null
-                            ? env_app!.isNotEmpty
-                              ? ListView.builder(
-                                shrinkWrap: true,
-                                // 禁止子列表滚动
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: env_app == null
-                                          ? 0
-                                          : env_app!.length,
-                                itemBuilder:(context, index) {
-                                  // 处理Flutter的BUG引起的ListView.builder
-                                  // 提早加载的问题
-                                  try {
-                                    return AppInfoPage_EnvWidget_App(
-                                      curIndex: index, 
-                                      curKey: env_app!.keys.elementAt(index), 
-                                      curValue: env_app!.values.elementAt(index),
-                                      textctl_env_name: textctl_env_name_list[index],
-                                      textctl_env_value: textctl_env_value_list[index],
-                                      updateEnvKey: (curIndex, newKey) async {
-                                        return await ConfigEnv_updateKey(curIndex, newKey);
-                                      },
-                                      updateEnvValue: (curIndex, newValue) async {
-                                        await ConfigEnv_updateValue(curIndex, newValue);
-                                      },
-                                      deleteEnvItem: (curIndex) async {
-                                        await ConfigEnv_deleteItem(curIndex);
-                                      },
-                                    );
-                                  }
-                                  catch (e) {
-                                    return SizedBox.shrink();
-                                  }
-                                },
-                              )
-                              : SizedBox.shrink()
-                            : SizedBox.shrink(),
+                            env_app_build.isNotEmpty
+                            ? ListView.builder(
+                              shrinkWrap: true,
+                              // 禁止子列表滚动
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: env_app_build.length,
+                              itemBuilder:(context, index) {
+                                // 处理Flutter的BUG引起的ListView.builder
+                                // 提早加载的问题
+                                try {
+                                  return AppInfoPage_EnvWidget_App(
+                                    curIndex: index, 
+                                    curKey: env_app_build.keys.elementAt(index), 
+                                    curValue: env_app_build.values.elementAt(index),
+                                    textctl_env_name: textctl_env_name_list[index],
+                                    textctl_env_value: textctl_env_value_list[index],
+                                    updateEnvKey: (curIndex, newKey) async {
+                                      return await ConfigEnv_updateKey(curIndex, newKey);
+                                    },
+                                    updateEnvValue: (curIndex, newValue) async {
+                                      await ConfigEnv_updateValue(curIndex, newValue);
+                                    },
+                                    deleteEnvItem: (curIndex) async {
+                                      await ConfigEnv_deleteItem(curIndex);
+                                    },
+                                  );
+                                }
+                                catch (e) {
+                                  return SizedBox.shrink();
+                                }
+                              },
+                            )
+                            : SizedBox.shrink()
                           ],
                         ),
                       ),
