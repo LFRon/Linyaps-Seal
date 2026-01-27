@@ -9,7 +9,7 @@ import 'package:linyaps_seal/utils/config_classes/config_all_global.dart';
 
 class GlobalAppState_Config extends GetxController {
 
-  // 已存在的全局玲珑配置, 并提供转换为JSON的Map<String, dynamic>形式
+  // 已存在的全局玲珑配置, 并提供转换为JSON的Map<String, dynamic>的响应式
   Rx <ConfigAll_Global> global_config = ConfigAll_Global().obs;
 
   // 用于更新已存在的玲珑全局配置
@@ -26,7 +26,7 @@ class GlobalAppState_Config extends GetxController {
       global_config.value.env = env_get;
     }
 
-    // ToDo: 去做新加别的扩展功能
+    // TODO: 去做新加别的扩展功能
 
     update();
     return;
