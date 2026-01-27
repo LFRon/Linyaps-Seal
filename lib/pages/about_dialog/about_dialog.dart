@@ -142,7 +142,7 @@ class _MyAboutDialogState extends State<MyAboutDialog> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '访问源代码',
+                              '查看源代码',
                               style: TextStyle(
                                 fontSize: 16,
                               ),
