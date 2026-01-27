@@ -322,7 +322,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
         List <Extension> ext_list_base_builder = [];
         if (gConf.global_config.value.ext_defs != null) {
           ext_list_base_builder = gConf.global_config.value
-                          .ext_defs![cur_app_base] ?? [];
+                                  .ext_defs![cur_app_base] ?? [];
         }
 
         // 页面构建时存储应用对应的扩展列表, 这里强制非空防止UI构建时出现空异常
