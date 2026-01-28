@@ -365,8 +365,7 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                           height: 160,width: 160,
                           placeholder: (context, loadingProgress) {
                             return Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.grey,
+                              child: YaruCircularProgressIndicator(
                                 strokeWidth: 3.0,
                               ),
                             );

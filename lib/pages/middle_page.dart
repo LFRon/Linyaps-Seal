@@ -149,8 +149,7 @@ class _MainMiddlePageState extends State<MainMiddlePage> {
                       height: 50,width: 50,
                       placeholder: (context, loadingProgress) {
                         return Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.grey,
+                          child: YaruCircularProgressIndicator(
                             strokeWidth: 3.0,
                           ),
                         );
