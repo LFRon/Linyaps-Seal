@@ -15,6 +15,9 @@ import 'package:linyaps_seal/utils/Global_Variables/repo_arch.dart';
 import 'package:yaru/settings.dart';
 
 void main() async {
+
+  // 确认Flutter初始化控件加载完成
+  WidgetsFlutterBinding.ensureInitialized();
   
   // 启动前先检查:
   // 1. 当前应用实例是否为单实例 (也就是只打开了一个app没打开第二个)
@@ -22,9 +25,6 @@ void main() async {
   // 如果不是, 则退出程序
   bool isSingleInstance = await FlutterSingleInstance().isFirstInstance();
   if (!isSingleInstance || !Platform.isLinux) exit(0);
-
-  // 确认Flutter初始化控件加载完成
-  WidgetsFlutterBinding.ensureInitialized();
 
   // 初始化所有GetX管理的全局类实例
   // 创建GetX管理共享的ApplicationState实例
