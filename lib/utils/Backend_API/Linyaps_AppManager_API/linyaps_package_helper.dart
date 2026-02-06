@@ -60,8 +60,11 @@ class LinyapsPackageHelper {
     Map <String, dynamic>? app_config_get = await LinyapsCliHelper.get_linyaps_global_config();
     // 初始化待返回内容
     Map <String, List<Extension>> returnItems = {};
-    if (app_config_get != null) {
-      app_config_get["ext_defs"].forEach((key, value) {
+
+    // 全局配置如果存在则返回, 否则返回空
+    // 使用try-catch语法提升语法简洁性
+    try {
+      app_config_get!["ext_defs"]!.forEach((key, value) {
         // 在循环内初始化待赋值的extensions列表
         String base = key;
         List <Extension> extensions = [];
@@ -77,7 +80,7 @@ class LinyapsPackageHelper {
         returnItems[base] = extensions;
       });
       return returnItems;
-    } else {
+    } catch (e) {
       return null;
     }
   }
