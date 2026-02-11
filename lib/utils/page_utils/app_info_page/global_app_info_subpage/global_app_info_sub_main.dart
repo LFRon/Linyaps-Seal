@@ -32,6 +32,9 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
 
   /*-----------------------------扩展配置部分---------------------------------*/
 
+  // 初始化存储有序字典的扩展base信息是否合法的变量列表
+  RxList <bool> ext_defs_is_base_valid_list = <bool>[].obs;
+
   // 初始化指向全局扩展列表的指针
   Map<String, List<Extension>>? get ext_defs => gAppConf.global_config.value
                                                 .ext_defs; 
@@ -78,10 +81,15 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
   }
 
   // 扩展: 当用户更改base文字时立刻触发的函数
-  Future <void> ConfigExt_updateBaseInfo (String new_base_name, int index) async {
+  // 返回true代表修改成功, false代表当前值无效
+  Future <bool> ConfigExt_updateBaseInfo (String new_base_name, int index) async {
     
     // 存储原先oldBase的名字
     String oldBaseName = ext_defs!.keys.elementAt(index);
+
+    // 检查base名字是否重复或为空, 如果是直接跳过
+    if (new_base_name.isEmpty) return false;
+    if (ext_defs!.containsKey(new_base_name)) return false;
 
     // 更新base信息, 并移除旧base信息
     ext_defs![new_base_name] = ext_defs![oldBaseName]!;
@@ -101,7 +109,7 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
 
     gAppConf.update();  // 触发响应式更新
     await LinyapsCliHelper.write_linyaps_global_config();   // 写入新配置
-    return;
+    return true;
   }
 
   // 扩展: 当用户在每个Base里更改其中扩展名字时触发的函数
@@ -126,6 +134,8 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
       );
       // 添加新的Base信息
       ext_defs![''] = [];
+      // Base是否合法检查器新增元素
+      ext_defs_is_base_valid_list.add(true);
       gAppConf.update();
     });
     return;
@@ -178,7 +188,10 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     if (mounted) setState(() {
       // 获取对应键
       String base = ext_defs!.keys.elementAt(index);
+      // 删除对应键值对
       ext_defs!.remove(base);
+      // 删除对应的Base合法性检查器
+      ext_defs_is_base_valid_list.removeAt(index);
       // 删除对应Base的文本控制器
       textctl_ext_base_list.removeAt(index);
       // 删除与对应Base相关的所有扩展控制器
@@ -365,6 +378,13 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
     Future.microtask(() async {
       // 初始化UI文本控制器
       await ConfigExt_initTextCtlList();
+      // 初始化判断扩展信息是否合法的全局变量
+      if (ext_defs != null) {
+        ext_defs_is_base_valid_list.value = List.generate(
+          ext_defs!.length,
+          (index) => true,
+        );
+      }
       // 初始化环境变量
       await ConfigEnv_initial();
       // 设置页面加载完成
@@ -573,25 +593,71 @@ class _AppInfoPage_GlobalConfState extends State<AppInfoPage_GlobalConf> {
                                           ),
                                         ),
                                         const SizedBox(width: 5,),
-                                        SizedBox(
+                                        Obx(() => SizedBox(
                                           height: 30,
                                           width: 220,
                                           child: TextField(
                                             controller: textctl_ext_base_list[index],
                                             onChanged: (value) async {
-                                              await ConfigExt_updateBaseInfo(value, index);
+                                              ext_defs_is_base_valid_list[index] = await ConfigExt_updateBaseInfo(value, index);
+                                              ext_defs_is_base_valid_list.refresh(); // 刷新列表
                                             },
-                                            decoration: InputDecoration(
+                                            decoration: ext_defs_is_base_valid_list[index]
+                                            ? InputDecoration(
                                               contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8), // 调整内边距
                                               border: OutlineInputBorder(),   // 可选：添加边框样式
+                                            )
+                                            : InputDecoration(
+                                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8), // 调整内边距
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                  color: Colors.yellow.shade700,
+                                                  width: 2,
+                                                ),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                  color: Colors.yellow.shade700,
+                                                  width: 2,
+                                                ),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ), 
                                             ),
                                             style: TextStyle(
                                               height: 1.3
                                             ),
                                             maxLines: 1,
                                           ),
-                                        ),
+                                        )),
                                         const SizedBox(width: 20,),
+                                        Obx(() {
+                                          if (!ext_defs_is_base_valid_list[index]) {
+                                            return Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                SizedBox(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child: Icon(
+                                                    Icons.warning_amber_outlined,
+                                                    color: Colors.yellow.shade700,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '发现无效设置',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.yellow.shade700,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 20,),
+                                              ],
+                                            );
+                                          } else {
+                                            return SizedBox.shrink();
+                                          }
+                                        }),
                                         // 将删除按钮与增加按钮并排
                                         SizedBox(
                                           height: 30,
