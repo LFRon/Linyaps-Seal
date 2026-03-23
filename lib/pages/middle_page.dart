@@ -100,8 +100,10 @@ class _MainMiddlePageState extends State<MainMiddlePage> {
                       ),
                       const SizedBox(width: 20,),
                       Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 6,),
                           SizedBox(
                             width: 180,
                             child: Text(
@@ -115,7 +117,6 @@ class _MainMiddlePageState extends State<MainMiddlePage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          SizedBox(height: 2,),
                           SizedBox(
                             width: 180,
                             child: Text(
@@ -166,6 +167,7 @@ class _MainMiddlePageState extends State<MainMiddlePage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const SizedBox(height: 6,),
                         SizedBox(
                           width: 180,
                           child: Text(
