@@ -3,8 +3,9 @@
 // 关闭VSCode非必要报错
 // ignore_for_file: camel_case_types, must_be_immutable, non_constant_identifier_names, curly_braces_in_flow_control_structures
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:linyaps_seal/utils/Backend_API/Linyaps_CLI_API/linyaps_cli_helper.dart';
 import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
@@ -370,7 +371,12 @@ class _AppInfoPage_AppConfState extends State<AppInfoPage_AppConf> {
                               ),
                             );
                           },
-                          errorWidget: (context, error, stackTrace) => Center(
+                          // fallback for .svg
+                          unsupportedImageBuilder: (context, url, bytes) {
+                            // `bytes` are the already-cached file bytes.
+                            return SvgPicture.memory(bytes); // from flutter_svg
+                          },
+                          errorBuilder: (context, error, stackTrace) => Center(
                             child: Image(
                               image: AssetImage(
                                 'assets/images/linyaps-generic-app.png',
