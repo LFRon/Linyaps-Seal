@@ -64,7 +64,7 @@ class _AppBar_MiddlePageState extends State<AppBar_MiddlePage> {
             ),
           ),
           SizedBox(
-            width: 80,
+            width: 85,
             height: 35,
             child: about_button,
           ),
