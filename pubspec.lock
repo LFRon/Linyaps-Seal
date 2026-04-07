@@ -864,10 +864,11 @@ packages:
   yaru:
     dependency: "direct main"
     description:
-      name: yaru
-      sha256: "8c2d9602963efd52479e77f0052ceea05f491e7a31d2ca337c44901f526f8226"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: "7442e8513d8af5b82e5beb748dc6f5a510224c44"
+      url: "https://github.com/ubuntu/yaru.dart.git"
+    source: git
     version: "10.0.0"
   yaru_window:
     dependency: transitive

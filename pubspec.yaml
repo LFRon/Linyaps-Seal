@@ -36,13 +36,16 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.7.3
   flutter_single_instance: ^1.7.0
-  yaru: ^10.0.0
   dio: ^5.9.0
   internet_connection_checker_plus: ^2.9.1+2
   env_variables: ^1.0.1
   url_launcher: ^6.3.2
   cached_network_image_ce: ^4.6.3
   flutter_svg: ^2.2.4
+  yaru:
+    git: 
+      url: https://github.com/ubuntu/yaru.dart.git
+      ref: main
 
 dev_dependencies:
   flutter_test:
