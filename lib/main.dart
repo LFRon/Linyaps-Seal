@@ -12,6 +12,7 @@ import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/installed_apps.dart';
 import 'package:linyaps_seal/utils/Global_Variables/repo_arch.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:yaru/settings.dart';
 
 void main() async {
@@ -25,6 +26,9 @@ void main() async {
   // 如果不是, 则退出程序
   bool isSingleInstance = await FlutterSingleInstance().isFirstInstance();
   if (!isSingleInstance || !Platform.isLinux) exit(0);
+
+  // 监听窗口关闭事件，实现快速退出
+  WindowManager.instance.addListener(_WindowCloseListener());
 
   // 初始化所有GetX管理的全局类实例
   // 创建GetX管理共享的ApplicationState实例
@@ -54,6 +58,15 @@ void main() async {
     ),
   );
   
+}
+
+// 窗口关闭监听器 - 实现快速退出
+class _WindowCloseListener with WindowListener {
+  @override
+  void onWindowClose() async {
+    // 阻止默认的关闭行为，直接退出应用
+    exit(0);
+  }
 }
 
 class MyApp extends StatefulWidget {
