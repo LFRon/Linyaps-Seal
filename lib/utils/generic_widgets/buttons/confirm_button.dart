@@ -23,6 +23,9 @@ class MyButton_Confirm extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: onPressed,
+      style: ButtonStyle(
+        mouseCursor: WidgetStateMouseCursor.adaptiveClickable,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

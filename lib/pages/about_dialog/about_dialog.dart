@@ -98,6 +98,7 @@ class _MyAboutDialogState extends State<MyAboutDialog> {
                       onPressed: () async {
                         await reportIssue();
                       },
+                      mouseCursor: WidgetStateMouseCursor.clickable,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(15),
@@ -130,6 +131,7 @@ class _MyAboutDialogState extends State<MyAboutDialog> {
                       onPressed: () async {
                         await visitSource();
                       },
+                      mouseCursor: WidgetStateMouseCursor.clickable,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(15),

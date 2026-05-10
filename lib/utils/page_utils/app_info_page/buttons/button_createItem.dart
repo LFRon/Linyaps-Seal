@@ -27,6 +27,7 @@ class MyButton_CreateItem extends StatelessWidget {
         // 更改其内置的边距
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.zero,
+          enabledMouseCursor: SystemMouseCursors.click,
         ),
         onPressed: value ? onPressed : null,
         child: Row(

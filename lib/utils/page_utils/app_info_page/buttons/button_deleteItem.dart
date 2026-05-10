@@ -23,6 +23,7 @@ class MyButton_DeleteItem extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: YaruColors.adwaitaRed,
         padding: EdgeInsets.zero,
+        enabledMouseCursor: SystemMouseCursors.click,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

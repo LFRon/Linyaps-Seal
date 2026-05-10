@@ -4,6 +4,7 @@
 // ignore_for_file: camel_case_types, non_constant_identifier_names, must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:yaru/widgets.dart';
 
 class MyButton_About extends StatefulWidget {
@@ -33,6 +34,9 @@ class _MyButton_AboutState extends State<MyButton_About> {
       valueListenable: widget.is_pressed,
       builder: (context,value,child) {
         return FilledButton(
+          style: ButtonStyle(
+            mouseCursor: WidgetStateMouseCursor.clickable,
+          ),
           onPressed: () async {    // 设置按下之后触发的函数(方法)   
           // 防止用户多次同时按下按钮,所以只允许按钮在is_pressed为假时才可以触发执行函数
             if (!value) {
