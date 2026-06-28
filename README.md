@@ -4,8 +4,8 @@
 Manage Linyaps apps permissions.
 
 ## 使用的Flutter框架
-Flutter: 3.41.9
-Dart: 3.11.5
+Flutter: 3.44.4
+Dart: 3.12.2
 
 ## Getting Started
 
