@@ -4,15 +4,17 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_single_instance/flutter_single_instance.dart';
+import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:get/get.dart';
 import 'package:linyaps_seal/pages/middle_page.dart';
 import 'package:linyaps_seal/utils/Global_Variables/cur_app_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/global_config_info.dart';
 import 'package:linyaps_seal/utils/Global_Variables/installed_apps.dart';
 import 'package:linyaps_seal/utils/Global_Variables/repo_arch.dart';
-import 'package:nativeapi/nativeapi.dart';
 import 'package:yaru/settings.dart';
 
 void main() async {
@@ -24,18 +26,12 @@ void main() async {
   bool isSingleInstance = await FlutterSingleInstance().isFirstInstance();
   if (!isSingleInstance || !Platform.isLinux) exit(0);
 
-  // 监听窗口关闭事件，实现快速退出
-  final windowManager = WindowManager.instance;
-  final window = windowManager.getCurrent();
-  // 设置窗口样式
-  window?.titleBarStyle = TitleBarStyle.normal;
-
-  // 确认Flutter初始化控件加载完成
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  WindowManager.instance.setWillHideHook((windowId) {
-    exit(0);
+  // 实现监听窗口关闭行为, 实现快速且正常的关闭窗口按钮按下时的退出行为
+  await FlutterWindowClose.setWindowShouldCloseHandler(() async {
+    await ServicesBinding.instance.exitApplication(AppExitType.required);
+    return false;
   });
+  WidgetsFlutterBinding.ensureInitialized();   // 确保程序主窗口已加载
 
   // 初始化所有GetX管理的全局类实例
   // 创建GetX管理共享的ApplicationState实例
