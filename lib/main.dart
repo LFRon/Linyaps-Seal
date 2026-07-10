@@ -66,7 +66,7 @@ void main() async {
 class MyApp extends StatefulWidget {
   
   // 在这里声明当前应用版本号
-  static String cur_version = '0.0.17';
+  static String cur_version = '0.0.18';
 
   const MyApp({super.key});
   @override
